@@ -6,21 +6,35 @@ Install dependency:  pip install pypdf
 Usage:               python3 extract_pdf.py textbook.pdf output.txt
 """
 
-import sys
+from argparse import ArgumentParser, Namespace
+
 from pypdf import PdfReader
 
+SCENE_REGEX = r"^\d+\.[[:space:]]Szene"
 
-def extract(pdf_path: str, out_path: str) -> None:
+def parse_arguments() -> Namespace:
+    parser = ArgumentParser()
+    parser.add_argument("--input", help="The input pdf file which shall be converted.", type=str, required=True)
+    parser.add_argument("--output", help="The output json file.", type=str, required=True)
+    parser.add_argument("--startpage", help="The page to start at when parsing the document", type=int, default=1)
+    return parser.parse_args()
+
+def extract(pdf_path: str, out_path: str, start_page: int = 1) -> str:
+    pages = []
     reader = PdfReader(pdf_path)
     with open(out_path, "w", encoding="utf-8") as out:
         for i, page in enumerate(reader.pages, start=1):
-            text = page.extract_text() or ""
-            out.write(f"\n===== PAGE {i} =====\n")
-            out.write(text.strip() + "\n")
+            if i >= start_page:
+                text = page.extract_text() or ""
+                pages.append(text + "\n")
     print(f"Done: {len(reader.pages)} pages -> {out_path}")
+    return "".join(pages)
+
+def parse_text(text: str) -> None:
+    block_id = 0
 
 
 if __name__ == "__main__":
-    pdf = sys.argv[1] if len(sys.argv) > 1 else "textbook.pdf"
-    out = sys.argv[2] if len(sys.argv) > 2 else "out/output.txt"
-    extract(pdf, out)
+    args = parse_arguments()
+    text = extract(pdf_path=args.input, out_path=args.output, start_page=args.startpage)
+    parse_text(text)
