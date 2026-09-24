@@ -2,6 +2,7 @@ import re
 
 from actor import Actor
 from block import Block
+from page import Page
 
 OPENING_REGEX = re.compile(r"^Vorspann$")
 CURTAIN_REGEX = re.compile(r"^Vorhang$")
@@ -25,8 +26,8 @@ class TextbookParser:
     def __init__(self, actors: list[Actor]):
         self._known_names = Actor.known_character_names(actors)
 
-    def parse(self, text: str) -> list[Block]:
-        lines = text.splitlines()
+    def parse(self, pages: list[Page]) -> list[Block]:
+        lines, line_page_numbers = self._split_into_lines(pages)
         total_lines = len(lines)
         index = 0
         next_id = 0
@@ -35,13 +36,14 @@ class TextbookParser:
         awaiting_cast_list = False
         blocks: list[Block] = []
 
-        def make_block(block_type: str, block_text: str, character: str = None, direction: str = None) -> Block:
+        def make_block(block_type: str, block_text: str, start_index: int, character: str = None, direction: str = None) -> Block:
             nonlocal next_id
             block = Block(
                 id=next_id,
                 type=block_type,
                 part=current_part,
                 scene=current_scene,
+                page=line_page_numbers[start_index],
                 text=block_text,
                 character=character,
                 direction=direction,
@@ -60,6 +62,7 @@ class TextbookParser:
             if not line:
                 index += 1
                 continue
+            start_index = index
 
             if OPENING_REGEX.match(line):
                 current_part = line
@@ -81,7 +84,7 @@ class TextbookParser:
                 continue
 
             if CURTAIN_REGEX.match(line):
-                blocks.append(make_block("command", line))
+                blocks.append(make_block("command", line, start_index))
                 awaiting_cast_list = False
                 index += 1
                 continue
@@ -96,7 +99,7 @@ class TextbookParser:
                 while index < total_lines and lines[index].strip() and not match_known_cue(lines[index].strip()):
                     spoken_lines.append(lines[index].strip())
                     index += 1
-                blocks.append(make_block("dialogue", " ".join(spoken_lines), character=character, direction=direction))
+                blocks.append(make_block("dialogue", " ".join(spoken_lines), start_index, character=character, direction=direction))
                 continue
 
             # A bare comma-separated line right after a scene heading lists the
@@ -105,7 +108,7 @@ class TextbookParser:
                 names = [name.strip() for name in line.split(",") if name.strip()]
                 awaiting_cast_list = False
                 if names and all(name in self._known_names for name in names):
-                    blocks.append(make_block("acting", line))
+                    blocks.append(make_block("acting", line, start_index))
                     index += 1
                     continue
 
@@ -123,7 +126,7 @@ class TextbookParser:
                 index += 1
             paragraph = " ".join(paragraph_lines)
             block_type = "command" if self._is_tech_command(paragraph) else "acting"
-            blocks.append(make_block(block_type, paragraph))
+            blocks.append(make_block(block_type, paragraph, start_index))
 
         return blocks
 
@@ -131,3 +134,18 @@ class TextbookParser:
     def _is_tech_command(paragraph: str) -> bool:
         lowered = paragraph.lower()
         return any(re.search(rf"\b{keyword}\b", lowered) for keyword in TECH_KEYWORDS)
+
+    @staticmethod
+    def _split_into_lines(pages: list[Page]) -> tuple[list[str], list[int]]:
+        """Flattens the pages into one list of lines, plus the page number each line came from.
+
+        Pages are concatenated without a separator so that dialogue and paragraphs
+        spanning a page break are still recognized as a single block.
+        """
+        lines: list[str] = []
+        line_page_numbers: list[int] = []
+        for page in pages:
+            page_lines = page.text.splitlines()
+            lines.extend(page_lines)
+            line_page_numbers.extend([page.number] * len(page_lines))
+        return lines, line_page_numbers

@@ -26,3 +26,7 @@ The format (dataset) shall then be saved in a json or parquet file.
 - Clean code first!
 - NEVER EVER read any files that are copyright protected. Reading files from `in/` or `out/` is considered to be a 
   crime. Example files will be provided instead.
+
+## Applications
+
+- `src/script_parser.py` The first program which parses the textbook from PDF and extracts all blocks.

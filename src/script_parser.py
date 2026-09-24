@@ -52,4 +52,4 @@ if __name__ == "__main__":
     if args.trim_last_line:
         trim_last_line(pages)
     blocks = TextbookParser(actors).parse(pages)
-    #WorkbookExporter().export(actors, blocks, args.output)
+    WorkbookExporter().export(actors, blocks, args.output)

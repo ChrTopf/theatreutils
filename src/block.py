@@ -14,6 +14,7 @@ class Block:
     type: str
     part: str
     scene: int
+    page: int
     text: str
     character: Optional[str] = None
     direction: Optional[str] = None
@@ -24,6 +25,7 @@ class Block:
             "type": self.type,
             "part": self.part,
             "scene": self.scene,
+            "page": self.page,
             "text": self.text,
             "character": self.character,
             "direction": self.direction,
