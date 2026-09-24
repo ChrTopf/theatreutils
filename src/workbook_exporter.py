@@ -21,7 +21,7 @@ TYPE_FONTS = {
 SCENE_BORDER = Border(top=Side(style="thin", color="808080"))
 PART_BORDER = Border(top=Side(style="thick", color="000000"))
 
-BLOCK_HEADERS = ("ID", "Part", "Scene", "Page", "Type", "Character", "Direction", "Text")
+BLOCK_HEADERS = ("ID", "Part", "Scene", "Page", "Type", "Character", "Direction", "Text", "Mute", "Unmute")
 CHARACTER_HEADERS = ("Mic", "Actor", "Character", "Actions")
 TEXT_COLUMN_INDEX = BLOCK_HEADERS.index("Text") + 1
 TYPE_COLUMN_INDEX = BLOCK_HEADERS.index("Type") + 1
@@ -85,7 +85,8 @@ class WorkbookExporter:
                 previous_scene_key = scene_key
             previous_part = block.part
 
-            sheet.append([block.id, block.part, block.scene, block.page, block.type, block.character, block.direction, block.text])
+            sheet.append([block.id, block.part, block.scene, block.page, block.type, block.character, block.direction, block.text,
+                          ", ".join(block.mute), ", ".join(block.unmute)])
             row_number = sheet.max_row
             fill = PatternFill(start_color=SCENE_FILL_COLORS[fill_color_index], end_color=SCENE_FILL_COLORS[fill_color_index], fill_type="solid")
             border = PART_BORDER if part_changed else (SCENE_BORDER if scene_changed else None)

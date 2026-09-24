@@ -11,6 +11,7 @@ from argparse import ArgumentParser, Namespace
 from pypdf import PdfReader
 
 from actor import Actor
+from mic_annotator import MicAnnotator
 from textbook_parser import TextbookParser
 from workbook_exporter import WorkbookExporter
 from page import Page
@@ -24,6 +25,8 @@ def parse_arguments() -> Namespace:
     parser.add_argument("--characters", help="The path to the characters.json file. The characters must be saved in a specific json structure.", type=str, required=True)
     parser.add_argument("--trim-first-line", help="Specify if the first line of every page should be removed.", action='store_true')
     parser.add_argument("--trim-last-line", help="Specify, if the last line of every page should be removed.", action='store_true')
+    parser.add_argument("--threshold-turns", help="The minimum amount of dialogue blocks for triggering a mute / unmute of actors. (scenes already trigger automatic mute / unmute)", type=int, default=20)
+    parser.add_argument("--unmute-padding", help="The amount of blocks that an actor is unmuted before speaking up.", type=int, default=2)
     return parser.parse_args()
 
 
@@ -52,4 +55,5 @@ if __name__ == "__main__":
     if args.trim_last_line:
         trim_last_line(pages)
     blocks = TextbookParser(actors).parse(pages)
+    MicAnnotator(threshold_turns=args.threshold_turns, unmute_padding=args.unmute_padding).annotate(actors, blocks)
     WorkbookExporter().export(actors, blocks, args.output)
