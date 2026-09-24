@@ -1,0 +1,40 @@
+[
+    {
+        "mic": 1,
+        "actor": "Herbert",
+        "characters": [
+            {
+                "name": "Manfred",
+                "actions": 1
+            },
+            {
+                "name": "Dieter",
+                "actions": 1
+            }
+        ]
+    },
+    {
+        "mic": 2,
+        "actor": "Günter",
+        "characters": [
+            {
+                "name": "Polizist",
+                "actions": 1
+            }
+        ]
+    },
+    {
+        "mic": 3,
+        "actor": "Lisa",
+        "characters": [
+            {
+                "name": "Beate",
+                "actions": 2
+            },
+            {
+                "name": "Käthe",
+                "actions": 1
+            }
+        ]
+    }
+]
