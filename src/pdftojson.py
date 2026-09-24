@@ -13,6 +13,7 @@ from pypdf import PdfReader
 SCENE_REGEX = r"^\d+\.[[:space:]]Szene"
 OPENING_REGEX = r"^Vorspann"
 ACT_REGEX = r"^\d+\.[[:space:]]Akt"
+CURTAIN_REGEX = r"^Vorhang"
 
 def parse_arguments() -> Namespace:
     parser = ArgumentParser()

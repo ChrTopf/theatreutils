@@ -219,6 +219,5 @@ __marimo__/
 
 # Custom ignores
 *.pdf
-*.txt
 in/
 out/
