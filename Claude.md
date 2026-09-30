@@ -5,20 +5,24 @@ Ask clarifying questions before making architectural changes.
 
 ## About This Project
 
-This project is used to automatically read the textbook of a theater from a PDF file and parse it into a structured data
-format.
-The source code is written in python.
-The data format contains all characters and the entire textbook in one single dataset. 
-Additional commands for light and sound are to be added into the dataset together with the text.
-Each action, no matter if it is some text an actor says or some action the tech people need to perform, is represented
-as a block in the data format.
-The format (dataset) shall then be saved in a json or parquet file.
+This project contains multiple utility programs to prepare and conduct theater shows.
+List of applications:
+
+1. Script Parser: Reads the theater script from PDF file, calculates microphone mutes with the help of a json file and 
+   parses the output into an excel workbook.
+2. Script Viewer: Reads the output of the previous application which has been slightly modified and displays it in a 
+   window together with mute annotations, audio and lighting commands. This application is intended to be used during 
+   the live theater show.
+
+The source code of all applications is written in python. For graphical applications the pyqt library must be used.
+
 
 ## Key Directories
 
-- `src/` - Source code of the application
+- `src/` - Source code of the applications
 - `in/` - Input files, such as the textbook. NEVER READ THESE FILES!!! They are under copyright protection.
 - `out/` - Output files. That is where the output dataset shall land. NEVER READ THESE FILES!!! They are under copyright protection.
+- `examples/` - Example files for each format used by the applications.
 - `.venv/` - python virtual environment
 
 ## Standards
