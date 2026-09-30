@@ -14,7 +14,7 @@ List of applications:
    window together with mute annotations, audio and lighting commands. This application is intended to be used during 
    the live theater show to read through the text in parallel.
 
-The source code of all applications is written in python. For graphical applications the pyqt library must be used.
+The source code of all applications is written in python. For graphical applications the pyqt5 library must be used.
 
 ### The paradigm across all formats
 The core philosophy of all formats handled by the applications builds on blocks.
@@ -75,3 +75,4 @@ The table can contain additional columns which shall be ignored if the textbook 
 ## Applications
 
 - `src/script_parser.py` The first program which parses the textbook from PDF and extracts all blocks.
+- `src/script_viewer.py` The second program which displays the (enriched) workbook during the live show. Its UI classes live in `src/script_viewer_ui/`.

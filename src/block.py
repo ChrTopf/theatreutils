@@ -22,6 +22,8 @@ class Block:
     direction: Optional[str] = None
     mute: list[str] = field(default_factory=list)
     unmute: list[str] = field(default_factory=list)
+    audio_effect: Optional[str] = None
+    light: Optional[str] = None
 
     def to_dict(self) -> dict:
         return {
@@ -35,4 +37,6 @@ class Block:
             "direction": self.direction,
             "mute": self.mute,
             "unmute": self.unmute,
+            "audio_effect": self.audio_effect,
+            "light": self.light,
         }
