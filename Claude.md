@@ -90,3 +90,4 @@ An example of a generated file can be found in `examples/Hugo.037.snp`.
 
 - `src/script_parser.py` The first program which parses the textbook from PDF and extracts all blocks.
 - `src/script_viewer.py` The second program which displays the (enriched) workbook during the live show. Its UI classes live in `src/script_viewer_ui/`.
+- `src/cue_generator.py` The third program which generates the deck cues (currently X32 snippets) from the workbook.
