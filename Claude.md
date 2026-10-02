@@ -13,6 +13,8 @@ List of applications:
 2. Script Viewer: Reads the output of the previous application which has been slightly modified and displays it in a 
    window together with mute annotations, audio and lighting commands. This application is intended to be used during 
    the live theater show to read through the text in parallel.
+3. Cue generator: The last software in the chain which generates the cues for each deck. It takes the excel workbook as 
+   an input and several output files.
 
 The source code of all applications is written in python. For graphical applications the pyqt5 library must be used.
 
@@ -57,6 +59,18 @@ The Blocks Sheet contains a table with the following columns:
 | Light | string | The name of the light effect to be played during this block |
 
 The table can contain additional columns which shall be ignored if the textbook is imported.
+
+### Cue Generator - Output files
+The cue generator application takes the excel workbook as input. It uses both spreadsheets to perform its calculations 
+and generate the output files.
+
+#### Behringer X32 Scenes
+Every time a block contains an actor to be muted / unmuted, another `.snp` file must be generated. The generated files 
+must be stored in a directory which is given by the cli argument `--snp-output-dir`. Every file must follow the pattern 
+`<theater-name>.<3-digit-number>.snp` which originally comes from the Behringer x32 edit application. The name of the
+theater piece is given by the cli argument `--theater-name`. If the calculated number of scenes exceeds 100, a warning 
+message needs to be generated.
+An example of a generated file can be found in `examples/Hugo.037.snp`.
 
 ## Key Directories
 
