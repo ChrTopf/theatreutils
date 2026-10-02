@@ -1,17 +1,19 @@
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel, QMainWindow, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget
 
 from block import Block
 from script_viewer_ui import theme
-from script_viewer_ui.block_table_model import BlockTableModel
-from script_viewer_ui.block_table_view import BlockTableView
+from script_viewer_ui.block_list_model import BlockListModel
+from script_viewer_ui.block_list_view import BlockListView
+from script_viewer_ui.scene_index import SceneIndex
+from script_viewer_ui.scene_jump_bar import SceneJumpBar
 
 
 class ScriptViewerWindow(QMainWindow):
-    """Main window of the Script Viewer: a status line above the block table.
+    """Main window of the Script Viewer: the scene jump bar above the script document.
 
-    The status line shows where in the show the current block is located, so
-    the position can be told at a glance while following the performance.
+    The bar tells where in the show the current block is located and jumps to
+    any scene of any part, so the position can be read and changed at a glance
+    while following the performance.
     """
 
     def __init__(self, blocks: list[Block], title: str):
@@ -19,35 +21,32 @@ class ScriptViewerWindow(QMainWindow):
         self.setWindowTitle(f"Script Viewer - {title}")
         self._blocks = blocks
 
-        self._status_label = QLabel()
-        status_font = QFont()
-        status_font.setPointSize(theme.FONT_POINT_SIZE)
-        status_font.setBold(True)
-        self._status_label.setFont(status_font)
-        self._status_label.setStyleSheet(f"color: {theme.TEXT.name()}; padding: 6px;")
-
-        self._table = BlockTableView(BlockTableModel(blocks, self))
-        self._table.current_row_changed.connect(self._update_status)
+        self._jump_bar = SceneJumpBar(SceneIndex(blocks), len(blocks))
+        self._view = BlockListView(BlockListModel(blocks, self))
+        self._jump_bar.scene_selected.connect(self._jump_to_row)
+        self._view.current_row_changed.connect(self._update_position)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.addWidget(self._status_label)
-        layout.addWidget(self._table)
+        layout.addWidget(self._jump_bar)
+        layout.addWidget(self._view)
 
         central_widget = QWidget()
         central_widget.setLayout(layout)
-        central_widget.setStyleSheet(f"background-color: {theme.BACKGROUND.name()};")
+        central_widget.setStyleSheet(f"background-color: {theme.PAGE.name()};")
         self.setCentralWidget(central_widget)
 
-        self._table.setFocus()
-        self._update_status(0)
+        self._view.setFocus()
+        self._update_position(0)
 
-    def _update_status(self, row: int) -> None:
+    def _jump_to_row(self, row: int) -> None:
+        self._view.set_current_row(row)
+        # The document keeps the keyboard, so the arrow keys work right after a jump.
+        self._view.setFocus()
+
+    def _update_position(self, row: int) -> None:
         if not self._blocks:
-            self._status_label.setText("No blocks found in the workbook.")
+            self._jump_bar.show_empty_script()
             return
-        block = self._blocks[row]
-        self._status_label.setText(
-            f"{block.part}  ·  Scene {block.scene}  ·  Page {block.page}  ·  Block {row + 1} / {len(self._blocks)}"
-        )
+        self._jump_bar.show_current_block(row, self._blocks[row])

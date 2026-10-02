@@ -1,19 +1,19 @@
 from PyQt5.QtCore import QModelIndex, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QWheelEvent
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QTableView
+from PyQt5.QtWidgets import QAbstractItemView, QListView
 
 from script_viewer_ui import theme
-from script_viewer_ui.block_table_model import BlockTableModel, MIC_COLUMN, TEXT_COLUMN
-from script_viewer_ui.mic_cue_delegate import MicCueDelegate
+from script_viewer_ui.block_delegate import BlockDelegate
+from script_viewer_ui.block_list_model import BlockListModel
 
 # One notch of a regular mouse wheel, see QWheelEvent.angleDelta().
 WHEEL_NOTCH = 120
 PAGE_STEP = 10
-ROW_RESIZE_DELAY_MS = 100
+RELAYOUT_DELAY_MS = 100
 
 
-class BlockTableView(QTableView):
-    """The block table that is navigated block by block instead of pixel by pixel.
+class BlockListView(QListView):
+    """The document of block cards, navigated block by block instead of pixel by pixel.
 
     The scroll wheel and the arrow keys move the current block, which is always
     kept in the vertical center of the view. Clicking a block makes it current.
@@ -21,44 +21,32 @@ class BlockTableView(QTableView):
 
     current_row_changed = pyqtSignal(int)
 
-    def __init__(self, model: BlockTableModel, parent=None):
+    def __init__(self, model: BlockListModel, parent=None):
         super().__init__(parent)
         self._wheel_delta = 0
+        self._delegate = BlockDelegate(self)
         self.setModel(model)
-        self.setItemDelegateForColumn(MIC_COLUMN, MicCueDelegate(self))
+        self.setItemDelegate(self._delegate)
 
         self.setSelectionMode(QAbstractItemView.NoSelection)
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.setFocusPolicy(Qt.StrongFocus)
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setWordWrap(True)
-        self.setShowGrid(True)
-        self.setStyleSheet(
-            f"QTableView {{ background-color: {theme.BACKGROUND.name()}; gridline-color: {theme.GRID.name()}; border: none; }}"
-            f"QHeaderView::section {{ background-color: {theme.GRID.name()}; color: {theme.TEXT.name()}; "
-            f"padding: 4px; border: none; font-weight: bold; }}"
-        )
-        self.verticalHeader().hide()
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.setUniformItemSizes(False)
+        self.setStyleSheet(_STYLE_SHEET)
 
-        header = self.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.Interactive)
-        header.setStretchLastSection(True)
-        for column in range(model.columnCount()):
-            if column != TEXT_COLUMN:
-                self.resizeColumnToContents(column)
-                header.resizeSection(column, max(header.sectionSize(column), 140))
-
-        # Wrapped text changes its height whenever a column width changes, so the
-        # row heights are recalculated once the resizing has settled down.
-        self._row_resize_timer = QTimer(self, singleShot=True, interval=ROW_RESIZE_DELAY_MS)
-        self._row_resize_timer.timeout.connect(self._resize_rows)
-        header.sectionResized.connect(lambda *_: self._row_resize_timer.start())
+        # Wrapped text changes its height whenever the width changes, so all cards have
+        # to be re-measured - but only once the resizing has settled down.
+        self._relayout_timer = QTimer(self, singleShot=True, interval=RELAYOUT_DELAY_MS)
+        self._relayout_timer.timeout.connect(self._relayout)
 
         self.clicked.connect(self._on_clicked)
-        self._resize_rows()
+        self._delegate.set_viewport_width(self.viewport().width())
 
     @property
-    def _block_model(self) -> BlockTableModel:
+    def _block_model(self) -> BlockListModel:
         return self.model()
 
     def set_current_row(self, row: int) -> None:
@@ -100,15 +88,46 @@ class BlockTableView(QTableView):
 
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
+        self._relayout_timer.start()
         self._center_current_row()
 
     def _on_clicked(self, index: QModelIndex) -> None:
         self.set_current_row(index.row())
 
-    def _resize_rows(self) -> None:
-        self.resizeRowsToContents()
+    def _relayout(self) -> None:
+        if self._delegate.set_viewport_width(self.viewport().width()):
+            self.scheduleDelayedItemsLayout()
         self._center_current_row()
 
     def _center_current_row(self) -> None:
         if self._block_model.rowCount() > 0:
-            self.scrollTo(self._block_model.index(self._block_model.current_row, 0), QAbstractItemView.PositionAtCenter)
+            self.scrollTo(self._block_model.index(self._block_model.current_row), QAbstractItemView.PositionAtCenter)
+
+
+_STYLE_SHEET = f"""
+QListView {{
+    background-color: {theme.PAGE.name()};
+    border: none;
+    outline: none;
+}}
+QScrollBar:vertical {{
+    background: {theme.PAGE.name()};
+    width: 12px;
+    margin: 0;
+}}
+QScrollBar::handle:vertical {{
+    background: {theme.SCROLLBAR_HANDLE.name()};
+    border-radius: 4px;
+    min-height: 40px;
+    margin: 2px;
+}}
+QScrollBar::handle:vertical:hover {{
+    background: {theme.SCROLLBAR_HANDLE_HOVER.name()};
+}}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+    height: 0;
+}}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
+    background: none;
+}}
+"""

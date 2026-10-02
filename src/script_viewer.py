@@ -10,6 +10,7 @@ Navigation:          scroll wheel / arrow keys / space   next or previous block
                      page up / page down                 ten blocks back or forward
                      home / end                          first or last block
                      mouse click                         jump to the clicked block
+                     part / scene selectors              jump to a scene of a part
 """
 
 import os
