@@ -20,7 +20,7 @@ from argparse import ArgumentParser, Namespace
 from PyQt5.QtWidgets import QApplication, QFileDialog
 
 from script_viewer_ui import ScriptViewerWindow
-from workbook_importer import WorkbookImporter
+from workbook.workbook_importer import WorkbookImporter
 
 
 def parse_arguments() -> Namespace:

@@ -1,6 +1,6 @@
 from model.block import Block
-from lisp_cue_factory import LispCueFactory
-from midi_show_control import MidiShowControl
+from lisp_export.lisp_cue_factory import LispCueFactory
+from light_export.midi_show_control import MidiShowControl
 
 AUDIO_EXTENSION = ".wav"
 

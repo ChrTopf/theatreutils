@@ -1,6 +1,6 @@
 import os
 
-from model.x32_snippet import X32Snippet
+from snippet_export.x32_snippet import X32Snippet
 
 
 class SnippetWriter:

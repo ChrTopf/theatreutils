@@ -11,9 +11,9 @@ from argparse import ArgumentParser, Namespace
 from pypdf import PdfReader
 
 from model.actor import Actor
-from mic_annotator import MicAnnotator
+from util.mic_annotator import MicAnnotator
 from textbook_parser import TextbookParser
-from workbook_exporter import WorkbookExporter
+from workbook.workbook_exporter import WorkbookExporter
 from model.page import Page
 
 

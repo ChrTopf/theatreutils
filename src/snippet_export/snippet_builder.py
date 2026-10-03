@@ -2,7 +2,7 @@ import re
 
 from model.actor import Actor
 from model.block import Block
-from model.x32_snippet import X32Snippet
+from snippet_export.x32_snippet import X32Snippet
 
 PART_NUMBER_REGEX = re.compile(r"\d+")
 
