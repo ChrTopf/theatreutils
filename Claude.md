@@ -72,6 +72,26 @@ theater piece is given by the cli argument `--theater-name`. If the calculated n
 message needs to be generated.
 An example of a generated file can be found in `examples/Hugo.037.snp`.
 
+#### Lisp (Linux show player) project
+The cue generator must also generate cues for the linux show player. The result is a complete `.lsp` project.
+An example of such a json file is located at `examples/testcue 01.lsp`. Similar to the X32 scenes a new cue is
+generated for every mute/unmute snippet, audio and light direction. The file names for the audio are the same as in 
+the workbook ending with `.wav`. For the light there are preprogrammed cues in the chamsys magicq deck which just need 
+to be triggered with an OSC cue. If one block contains multiple actions from mute/unmute, audio and light commands, 
+three cues must be generated that are triggered at the same time. There are three command line options which determine
+what lands in the lisp project: `--lisp-mutes`, `--lisp-audio` and `--lisp-light`.
+The project is written to the file given by `--lisp-output`.
+
+Connection to the decks (LiSP 0.6.5 sends all OSC cues to one global host, which is reserved for the X32):
+- Mute/unmute cues are OSC cues `/-action/gosnippet <n>` that recall the X32 snippet with the same number as the
+  generated `.snp` file.
+- Audio cues are media cues playing `<Audio Effect>.wav`, which is expected next to the `.lsp` file.
+- Light cues are MIDI cues sending a MIDI Show Control `GO <cue>` to the ChamSys MagicQ. The MSC cue list is the
+  MagicQ playback (`--magicq-playback`, default 1), the device id is set by `--msc-device-id` (default 127 = all).
+  Every light effect name gets one MagicQ cue number (numbered from 1 in order of first appearance, reused if the
+  effect occurs again). The list of cues to program into the desk is written as CSV (`Cue`, `Effect`, `Blocks`) to
+  the file given by `--light-output`.
+
 ## Key Directories
 
 - `src/` - Source code of the applications
@@ -90,4 +110,4 @@ An example of a generated file can be found in `examples/Hugo.037.snp`.
 
 - `src/script_parser.py` The first program which parses the textbook from PDF and extracts all blocks.
 - `src/script_viewer.py` The second program which displays the (enriched) workbook during the live show. Its UI classes live in `src/script_viewer_ui/`.
-- `src/cue_generator.py` The third program which generates the deck cues (currently X32 snippets) from the workbook.
+- `src/cue_generator.py` The third program which generates the deck cues from the workbook.

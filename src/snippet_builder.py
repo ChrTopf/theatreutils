@@ -22,7 +22,15 @@ class SnippetBuilder:
 
     def build(self, actors: list[Actor], blocks: list[Block]) -> list[X32Snippet]:
         mic_by_actor = {actor.actor: actor.mic for actor in actors}
-        return [self._to_snippet(block, mic_by_actor) for block in blocks if block.mute or block.unmute]
+        return [self._to_snippet(block, mic_by_actor) for block in self._mic_change_blocks(blocks)]
+
+    def snippet_numbers(self, blocks: list[Block]) -> dict[int, int]:
+        """Maps the ID of every block yielding a snippet to the snippet's number, as written by SnippetWriter."""
+        return {block.id: number for number, block in enumerate(self._mic_change_blocks(blocks))}
+
+    @staticmethod
+    def _mic_change_blocks(blocks: list[Block]) -> list[Block]:
+        return [block for block in blocks if block.mute or block.unmute]
 
     def _to_snippet(self, block: Block, mic_by_actor: dict[str, int]) -> X32Snippet:
         snippet = X32Snippet(name=self._snippet_name(block))
