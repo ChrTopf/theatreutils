@@ -24,12 +24,6 @@ class LispCueFactory:
     def osc_integer_arg(value: int) -> dict:
         return {"end": 0, "fade": False, "start": value, "type": "Integer"}
 
-    def midi_cue(self, name: str, description: str, message: str) -> dict:
-        """`message` is the MIDI message in the text format of the mido library, e.g. "sysex data=(...)"."""
-        cue = self._base_cue("MidiCue", name, description)
-        cue["message"] = message
-        return cue
-
     def media_cue(self, name: str, description: str, uri: str) -> dict:
         """A cue playing the audio file `uri`, which LiSP resolves relative to the project file."""
         cue = self._base_cue("GstMediaCue", name, description)

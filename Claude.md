@@ -82,15 +82,24 @@ three cues must be generated that are triggered at the same time. There are thre
 what lands in the lisp project: `--lisp-mutes`, `--lisp-audio` and `--lisp-light`.
 The project is written to the file given by `--lisp-output`.
 
-Connection to the decks (LiSP 0.6.5 sends all OSC cues to one global host, which is reserved for the X32):
-- Mute/unmute cues are OSC cues `/-action/gosnippet <n>` that recall the X32 snippet with the same number as the
-  generated `.snp` file.
+Connection to the decks (LiSP 0.6.5 sends all OSC cues to one global host, the OSC relay, see below). The first
+address segment of every OSC cue names the target deck (`/x32/...` or `/mq/...`):
+- Mute/unmute cues are OSC cues `/x32/-action/gosnippet <n>` that recall the X32 snippet with the same number as the
+  generated `.snp` file. Snippets are numbered from 1.
 - Audio cues are media cues playing `<Audio Effect>.wav`, which is expected next to the `.lsp` file.
-- Light cues are MIDI cues sending a MIDI Show Control `GO <cue>` to the ChamSys MagicQ. The MSC cue list is the
-  MagicQ playback (`--magicq-playback`, default 1), the device id is set by `--msc-device-id` (default 127 = all).
+- Light cues are OSC cues `/mq/pb/<playback>/<cue>` (no arguments) that make the ChamSys MagicQ jump to the cue
+  (see https://docs.chamsys.co.uk/magicq/1.9.9.x/manual/OSC.html). The playback is set by `--magicq-playback`
+  (1-10, default 1, only the first 10 playbacks are controllable via OSC).
   Every light effect name gets one MagicQ cue number (numbered from 1 in order of first appearance, reused if the
   effect occurs again). The list of cues to program into the desk is written as CSV (`Cue`, `Effect`, `Blocks`) to
   the file given by `--light-output`.
+- No MIDI cues are generated: the MidiCue settings page of LiSP 0.6.5 crashes on SysEx (e.g. MSC) messages.
+
+### OSC Relay
+`src/osc_relay.py` receives the OSC messages of LiSP over UDP, removes the first address segment and forwards the
+otherwise unchanged packet to the deck it names: `/x32/...` to `--x32 <host>:<port>` (the X32 listens on 10023),
+`/mq/...` to `--magicq <host>:<port>` (the OSC receive port set on the MagicQ). It listens on `--listen-host`
+(default 127.0.0.1) and `--listen-port` (default 9001, LiSP's default OSC destination).
 
 ## Key Directories
 
@@ -111,3 +120,4 @@ Connection to the decks (LiSP 0.6.5 sends all OSC cues to one global host, which
 - `src/script_parser.py` The first program which parses the textbook from PDF and extracts all blocks.
 - `src/script_viewer.py` The second program which displays the (enriched) workbook during the live show. Its UI classes live in `src/script_viewer_ui/`.
 - `src/cue_generator.py` The third program which generates the deck cues from the workbook.
+- `src/osc_relay.py` Runs during the show and forwards the OSC messages of LiSP to the X32 and the MagicQ.

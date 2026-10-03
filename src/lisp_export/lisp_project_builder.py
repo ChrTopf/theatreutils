@@ -1,6 +1,7 @@
 from model.block import Block
 from lisp_export.lisp_cue_factory import LispCueFactory
-from light_export.midi_show_control import MidiShowControl
+from light_export.magicq_osc import MagicQOsc
+from osc_routing.deck_routes import MAGICQ_ROUTE, X32_ROUTE
 
 AUDIO_EXTENSION = ".wav"
 
@@ -35,18 +36,22 @@ class LispProjectBuilder:
 
     - Mic changes recall the X32 snippet generated for the block via OSC.
     - Audio effects play `<Audio Effect>.wav`, located next to the project file.
-    - Light effects send an MSC GO for the pre-programmed MagicQ cue of the effect.
+    - Light effects make the MagicQ jump to the pre-programmed cue of the effect via OSC.
+
+    LiSP sends all OSC messages to a single host, the OSC relay (osc_relay.py).
+    The first address segment tells the relay which deck the message is for,
+    e.g. `/x32/-action/gosnippet` or `/mq/pb/1/5`, and is removed by it.
 
     A block with a single action becomes a single cue. A block with several
     actions becomes a collection cue that starts them at the same time, followed
     by the actions themselves, whose names are prefixed with "--".
     """
 
-    def __init__(self, cue_factory: LispCueFactory, msc: MidiShowControl,
+    def __init__(self, cue_factory: LispCueFactory, magicq: MagicQOsc,
                  snippet_numbers: dict[int, int], light_cue_numbers: dict[str, int],
                  include_mutes: bool, include_audio: bool, include_light: bool):
         self.cue_factory = cue_factory
-        self.msc = msc
+        self.magicq = magicq
         self.snippet_numbers = snippet_numbers
         self.light_cue_numbers = light_cue_numbers
         self.include_mutes = include_mutes
@@ -96,7 +101,7 @@ class LispProjectBuilder:
         return self.cue_factory.osc_cue(
             name="",
             description=",\n".join(lines),
-            path=X32_SNIPPET_RECALL_PATH,
+            path=f"/{X32_ROUTE}{X32_SNIPPET_RECALL_PATH}",
             args=[self.cue_factory.osc_integer_arg(snippet_number)],
         )
 
@@ -108,8 +113,9 @@ class LispProjectBuilder:
 
     def _light_cue(self, block: Block) -> dict:
         cue_number = self.light_cue_numbers[block.light]
-        return self.cue_factory.midi_cue(
+        return self.cue_factory.osc_cue(
             name="",
             description=f"{block.light} (MagicQ cue {cue_number})",
-            message=self.msc.go(cue_number),
+            path=f"/{MAGICQ_ROUTE}{self.magicq.jump_to_cue_path(cue_number)}",
+            args=[],
         )
