@@ -1,7 +1,7 @@
 import csv
 import os
 
-from block import Block
+from model.block import Block
 
 HEADERS = ("Cue", "Effect", "Blocks")
 

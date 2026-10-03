@@ -1,4 +1,4 @@
-from block import Block
+from model.block import Block
 from lisp_cue_factory import LispCueFactory
 from midi_show_control import MidiShowControl
 

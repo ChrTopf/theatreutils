@@ -1,8 +1,8 @@
 import re
 
-from actor import Actor
-from block import Block
-from x32_snippet import X32Snippet
+from model.actor import Actor
+from model.block import Block
+from model.x32_snippet import X32Snippet
 
 PART_NUMBER_REGEX = re.compile(r"\d+")
 

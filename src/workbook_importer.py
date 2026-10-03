@@ -2,9 +2,9 @@ from typing import Any, Optional
 
 from openpyxl import load_workbook
 
-from actor import Actor
-from block import Block
-from character import Character
+from model.actor import Actor
+from model.block import Block
+from model.character import Character
 
 BLOCKS_SHEET_NAME = "Blocks"
 REQUIRED_HEADERS = ("ID", "Part", "Scene", "Page", "Type", "Text")

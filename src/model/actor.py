@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 import json
 
-from character import Character
+from model.character import Character
 
 
 @dataclass

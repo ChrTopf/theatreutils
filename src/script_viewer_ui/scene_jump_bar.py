@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QWidget
 
-from block import Block
+from model.block import Block
 from script_viewer_ui import theme
 from script_viewer_ui.scene_index import SceneIndex
 

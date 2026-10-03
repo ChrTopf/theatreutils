@@ -10,11 +10,11 @@ Usage:               python3 pdftojson.py --input textbook.pdf --output out.json
 from argparse import ArgumentParser, Namespace
 from pypdf import PdfReader
 
-from actor import Actor
+from model.actor import Actor
 from mic_annotator import MicAnnotator
 from textbook_parser import TextbookParser
 from workbook_exporter import WorkbookExporter
-from page import Page
+from model.page import Page
 
 
 def parse_arguments() -> Namespace:

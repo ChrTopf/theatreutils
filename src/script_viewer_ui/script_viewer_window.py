@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget
 
-from block import Block
+from model.block import Block
 from script_viewer_ui import theme
 from script_viewer_ui.block_list_model import BlockListModel
 from script_viewer_ui.block_list_view import BlockListView

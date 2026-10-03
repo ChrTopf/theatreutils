@@ -6,7 +6,7 @@ from PyQt5.QtCore import QModelIndex, QRect, QRectF, QSize, Qt
 from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen, QTextDocument
 from PyQt5.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
 
-from block import Block
+from model.block import Block
 from script_viewer_ui import theme
 from script_viewer_ui.block_list_model import BLOCK_ROLE, IS_CURRENT_ROLE
 

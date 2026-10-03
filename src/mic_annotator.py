@@ -1,7 +1,7 @@
 from typing import Optional
 
-from actor import Actor
-from block import Block
+from model.actor import Actor
+from model.block import Block
 
 
 class MicAnnotator:

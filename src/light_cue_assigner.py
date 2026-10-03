@@ -1,4 +1,4 @@
-from block import Block
+from model.block import Block
 
 
 class LightCueAssigner:

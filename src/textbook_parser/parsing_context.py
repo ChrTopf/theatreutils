@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Optional
 
-from block import Block
+from model.block import Block
 from textbook_parser.line import Line
 from textbook_parser.line_classifier import LineClassifier
 

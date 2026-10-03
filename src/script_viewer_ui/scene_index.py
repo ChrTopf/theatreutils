@@ -1,6 +1,6 @@
 from typing import Optional
 
-from block import Block
+from model.block import Block
 
 
 class SceneIndex:

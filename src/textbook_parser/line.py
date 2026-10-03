@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from page import Page
+from model.page import Page
 
 
 @dataclass(frozen=True)
