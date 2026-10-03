@@ -54,6 +54,7 @@ def relay(listen_address: tuple[str, int], targets: dict[str, tuple[str, int]]) 
             except ValueError as error:
                 print(f"Dropped packet from {sender[0]}:{sender[1]}: {error}", file=sys.stderr)
                 continue
+            print(f"Routing message with topic '{routed.route}' to '{targets[routed.route]}'.")
             relay_socket.sendto(routed.packet, targets[routed.route])
 
 
