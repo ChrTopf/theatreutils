@@ -71,7 +71,7 @@
                     "Default"
                 ],
                 [
-                    "f36a033d-187c-4ed5-b7a8-9395e5ac7f67",
+                    "f42250af-7520-49fa-986a-b972dae1d50d",
                     "Default"
                 ]
             ],
@@ -206,18 +206,18 @@
             },
             "default_start_action": "Start",
             "default_stop_action": "Stop",
-            "description": "",
+            "description": "Mute Herbert,\nUnmute Lisa",
             "duration": 0.0,
             "fade_type": "Linear",
             "fadein_duration": 0.0,
             "fadein_type": "Linear",
             "fadeout_duration": 0.0,
             "fadeout_type": "Linear",
-            "id": "f36a033d-187c-4ed5-b7a8-9395e5ac7f67",
+            "id": "ad407605-67e6-4231-a8ca-cd5f43775951",
             "index": 4,
-            "name": "-- Akt 1 Scene 1 Block 30 Light",
+            "name": "Akt 2 Scene 2 Block 35",
             "next_action": "DoNothing",
-            "path": "/chamsys/path/to/cue",
+            "path": "",
             "post_wait": 0.0,
             "pre_wait": 0.0,
             "stylesheet": "font-size:11pt;",
@@ -229,8 +229,7 @@
             "triggers": {}
         },
         {
-            "_type_": "OscCue",
-            "args": [],
+            "_type_": "MidiCue",
             "controller": {
                 "keyboard": [],
                 "midi": [],
@@ -238,21 +237,20 @@
             },
             "default_start_action": "Start",
             "default_stop_action": "Stop",
-            "description": "Mute Herbert,\nUnmute Lisa",
-            "duration": 0.0,
-            "fade_type": "Linear",
+            "description": "Light Effect: Nacht",
+            "duration": 0,
             "fadein_duration": 0.0,
             "fadein_type": "Linear",
             "fadeout_duration": 0.0,
             "fadeout_type": "Linear",
-            "id": "ad407605-67e6-4231-a8ca-cd5f43775951",
+            "id": "f42250af-7520-49fa-986a-b972dae1d50d",
             "index": 5,
-            "name": "Akt 2 Scene 2 Block 35",
+            "message": "control_change channel=0 control=127 value=3",
+            "name": "-- Akt 1 Scene 1 Block 30 Light",
             "next_action": "DoNothing",
-            "path": "",
             "post_wait": 0.0,
             "pre_wait": 0.0,
-            "stylesheet": "font-size:11pt;",
+            "stylesheet": "font-size:10pt;",
             "timecode": {
                 "enabled": false,
                 "replace_hours": false,
@@ -293,17 +291,17 @@
             "selection_mode": false,
             "view_sizes": [
                 [
-                    220,
-                    780
+                    293,
+                    1039
                 ],
                 [
-                    209,
-                    1273,
-                    418
+                    280,
+                    1703,
+                    559
                 ],
                 [
-                    1485,
-                    419
+                    1986,
+                    560
                 ]
             ]
         },
