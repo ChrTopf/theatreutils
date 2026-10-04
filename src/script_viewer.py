@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-Display the blocks of a workbook produced by script_parser.py (optionally enriched
-with audio and light effects) to follow the text during the live show.
+Display the script exported by cue_generator.py to follow the text during the live show.
 
-Install dependency:  pip install pyqt5 openpyxl
-Usage:               python3 script_viewer.py --input blocks.xlsx
+Next to the text and its mic, audio and light effects, the LiSP cues, X32
+snippets and light cues generated for every block are shown in colored lanes.
+
+Install dependency:  pip install pyqt5
+Usage:               python3 script_viewer.py --input Hugo.json
 
 Navigation:          scroll wheel / arrow keys / space   next or previous block
                      page up / page down                 ten blocks back or forward
@@ -19,13 +21,13 @@ from argparse import ArgumentParser, Namespace
 
 from PyQt5.QtWidgets import QApplication, QFileDialog
 
+from model.script import Script
 from script_viewer_ui import ScriptViewerWindow
-from workbook.workbook_importer import WorkbookImporter
 
 
 def parse_arguments() -> Namespace:
     parser = ArgumentParser()
-    parser.add_argument("--input", help="The workbook file (.xlsx) to display. A file dialog is shown if omitted.", type=str)
+    parser.add_argument("--input", help="The script file (.json) written by cue_generator.py to display. A file dialog is shown if omitted.", type=str)
     return parser.parse_args()
 
 
@@ -35,11 +37,14 @@ if __name__ == "__main__":
 
     input_path = args.input
     if not input_path:
-        input_path, _ = QFileDialog.getOpenFileName(None, "Open workbook", "", "Excel workbook (*.xlsx)")
+        input_path, _ = QFileDialog.getOpenFileName(None, "Open script", "", "Script (*.json)")
         if not input_path:
             sys.exit(0)
 
-    blocks = WorkbookImporter().import_blocks(input_path)
-    window = ScriptViewerWindow(blocks, os.path.basename(input_path))
+    try:
+        script = Script.load(input_path)
+    except (OSError, ValueError, KeyError) as error:
+        sys.exit(f"Error: cannot read the script '{input_path}': {error}")
+    window = ScriptViewerWindow(script, os.path.basename(input_path))
     window.showMaximized()
     sys.exit(application.exec_())

@@ -1,5 +1,6 @@
 from model.block import Block
 from lisp_export.lisp_cue_factory import LispCueFactory
+from lisp_export.lisp_project import LispProject
 from light_export.magicq_osc import MagicQOsc
 from osc_routing.deck_routes import MAGICQ_ROUTE, X32_ROUTE
 
@@ -58,13 +59,16 @@ class LispProjectBuilder:
         self.include_audio = include_audio
         self.include_light = include_light
 
-    def build(self, blocks: list[Block]) -> dict:
+    def build(self, blocks: list[Block]) -> LispProject:
         cues = []
+        cue_block_ids = []
         for block in blocks:
-            cues += self._block_cues(block)
+            block_cues = self._block_cues(block)
+            cues += block_cues
+            cue_block_ids += [block.id] * len(block_cues)
         for index, cue in enumerate(cues):
             cue["index"] = index
-        return {"cues": cues, "meta": PROJECT_META, "session": PROJECT_SESSION}
+        return LispProject({"cues": cues, "meta": PROJECT_META, "session": PROJECT_SESSION}, cue_block_ids)
 
     def _block_cues(self, block: Block) -> list[dict]:
         block_name = f"{block.part} Scene {block.scene} Block {block.id}"

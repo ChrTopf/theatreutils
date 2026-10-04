@@ -25,6 +25,23 @@ class Block:
     audio_effect: Optional[str] = None
     light: Optional[str] = None
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "Block":
+        return cls(
+            id=data["id"],
+            type=data["type"],
+            part=data["part"],
+            scene=data["scene"],
+            page=data["page"],
+            text=data["text"],
+            character=data.get("character"),
+            direction=data.get("direction"),
+            mute=list(data.get("mute", [])),
+            unmute=list(data.get("unmute", [])),
+            audio_effect=data.get("audio_effect"),
+            light=data.get("light"),
+        )
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,

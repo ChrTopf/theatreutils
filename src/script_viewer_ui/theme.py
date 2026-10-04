@@ -11,6 +11,8 @@ FONT_POINT_SIZE = 14
 CHARACTER_POINT_SIZE = 12
 CUE_POINT_SIZE = 12
 STATUS_POINT_SIZE = 11
+LANE_POINT_SIZE = 11
+LANE_LABEL_POINT_SIZE = 10
 
 # Geometry of a block card, in pixels.
 MAX_CONTENT_WIDTH = 1200
@@ -21,6 +23,12 @@ CURRENT_BORDER_WIDTH = 2
 BLOCK_CORNER_RADIUS = 6
 CUE_COLUMN_WIDTH = 230
 COLUMN_GAP = 24
+
+# Geometry of the cue lanes running down the page right of the block cards, in pixels.
+LANE_WIDTH = 190
+LANE_GAP = 8
+LANE_LABEL_MARGIN = 8
+LANE_LABEL_PADDING = 8
 
 # The page the block cards lie on.
 PAGE = QColor("#0d0d0f")
@@ -49,6 +57,17 @@ AUDIO_EFFECT = QColor("#5cc8ff")
 DIMMED_AUDIO_EFFECT = QColor("#356079")
 LIGHT = QColor("#ffe066")
 DIMMED_LIGHT = QColor("#7d7039")
+
+# The cue lanes: the line text, a faint tint of the whole lane and the floating lane name.
+LISP_LANE = QColor("#c39bff")
+DIMMED_LISP_LANE = QColor("#6a5590")
+X32_LANE = QColor("#4fd8c4")
+DIMMED_X32_LANE = QColor("#2f7a70")
+LIGHT_CUE_LANE = QColor("#ffb84d")
+DIMMED_LIGHT_CUE_LANE = QColor("#86653a")
+LANE_TINT_ALPHA = 22
+LANE_EDGE_ALPHA = 90
+LANE_LABEL_BACKGROUND = QColor(13, 13, 15, 235)
 
 # The bar above the page holding the scene navigation and the position.
 BAR = QColor("#16161a")

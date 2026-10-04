@@ -2,6 +2,7 @@
 
 When working with this codebase, prioritize readability over cleverness. 
 Ask clarifying questions before making architectural changes.
+Never ever execute any git commands!
 
 ## About This Project
 
@@ -25,11 +26,10 @@ The documentation of this project can be found in README.md
 - Clean code first!
 - NEVER EVER read any files that are copyright protected. Reading files from `in/` or `out/` is considered to be a 
   crime. Example files will be provided instead.
-- Never execute git commands!
 
 ## Applications
 
 - `src/script_parser.py` The first program which parses the textbook from PDF and extracts all blocks.
-- `src/script_viewer.py` The second program which displays the (enriched) workbook during the live show. Its UI classes live in `src/script_viewer_ui/`.
-- `src/cue_generator.py` The third program which generates the deck cues from the workbook.
+- `src/script_viewer.py` The second program which displays the script (JSON) exported by the cue generator during the live show. Its UI classes live in `src/script_viewer_ui/`.
+- `src/cue_generator.py` The third program which generates the deck cues and the script (JSON) from the workbook.
 - `src/osc_relay.py` Runs during the show and forwards the OSC messages of LiSP to the X32 and the MagicQ.

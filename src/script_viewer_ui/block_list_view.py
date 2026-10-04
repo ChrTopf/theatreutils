@@ -1,10 +1,12 @@
-from PyQt5.QtCore import QModelIndex, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QWheelEvent
+from PyQt5.QtCore import QModelIndex, QRect, QRectF, Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QColor, QFont, QFontMetrics, QKeyEvent, QPainter, QPaintEvent, QWheelEvent
 from PyQt5.QtWidgets import QAbstractItemView, QListView
 
 from script_viewer_ui import theme
 from script_viewer_ui.block_delegate import BlockDelegate
 from script_viewer_ui.block_list_model import BlockListModel
+from script_viewer_ui.cue_lanes import LANES
+from script_viewer_ui.row_layout import RowLayout
 
 # One notch of a regular mouse wheel, see QWheelEvent.angleDelta().
 WHEEL_NOTCH = 120
@@ -17,6 +19,10 @@ class BlockListView(QListView):
 
     The scroll wheel and the arrow keys move the current block, which is always
     kept in the vertical center of the view. Clicking a block makes it current.
+
+    The names of the cue lanes float on top of the lanes at the upper edge of
+    the view. They are not part of any row, so they stay in place while the
+    blocks scroll by underneath.
     """
 
     current_row_changed = pyqtSignal(int)
@@ -90,6 +96,36 @@ class BlockListView(QListView):
         super().resizeEvent(event)
         self._relayout_timer.start()
         self._center_current_row()
+
+    def paintEvent(self, event: QPaintEvent) -> None:
+        super().paintEvent(event)
+        painter = QPainter(self.viewport())
+        painter.setRenderHint(QPainter.Antialiasing)
+        self._paint_lane_labels(painter)
+
+    def scrollContentsBy(self, dx: int, dy: int) -> None:
+        # Scrolling moves the already painted pixels, which would drag the lane names along.
+        super().scrollContentsBy(dx, dy)
+        self.viewport().update()
+
+    def _paint_lane_labels(self, painter: QPainter) -> None:
+        font = QFont()
+        font.setPointSize(theme.LANE_LABEL_POINT_SIZE)
+        font.setBold(True)
+        painter.setFont(font)
+        metrics = QFontMetrics(font)
+        height = metrics.height() + theme.LANE_LABEL_PADDING
+        layout = RowLayout(0, self.viewport().width())
+
+        for lane_index, lane in enumerate(LANES):
+            lane_rect = layout.lane_rect(lane_index, theme.LANE_LABEL_MARGIN, height)
+            width = min(metrics.horizontalAdvance(lane.name) + 2 * theme.LANE_LABEL_PADDING, lane_rect.width())
+            label = QRect(lane_rect.center().x() - width // 2, lane_rect.y(), width, height)
+
+            painter.setPen(lane.color)
+            painter.setBrush(theme.LANE_LABEL_BACKGROUND)
+            painter.drawRoundedRect(QRectF(label).adjusted(0.5, 0.5, -0.5, -0.5), height / 2, height / 2)
+            painter.drawText(label, Qt.AlignCenter, metrics.elidedText(lane.name, Qt.ElideRight, width))
 
     def _on_clicked(self, index: QModelIndex) -> None:
         self.set_current_row(index.row())

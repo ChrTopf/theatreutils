@@ -11,10 +11,13 @@ Generate the cues for the decks from a workbook produced by script_parser.py
   `--lisp-audio` and `--lisp-light` select which cues land in it. The OSC
   messages are sent to the decks through osc_relay.py.
 - Optionally a CSV list of the light cues that must be programmed into the MagicQ.
+- Optionally the script (.json) for script_viewer.py: the blocks of the workbook
+  together with the generated LiSP cues, X32 snippets and light cues.
 
 Install dependency:  pip install openpyxl
 Usage:               python3 cue_generator.py --input blocks.xlsx --snp-output-dir snippets --theater-name Hugo \
-                         --lisp-output Hugo.lsp --lisp-mutes --lisp-audio --lisp-light --light-output light_cues.csv
+                         --lisp-output Hugo.lsp --lisp-mutes --lisp-audio --lisp-light --light-output light_cues.csv \
+                         --script-output Hugo.json
 """
 
 import sys
@@ -26,6 +29,8 @@ from light_export.magicq_osc import MagicQOsc
 from lisp_export.lisp_cue_factory import LispCueFactory
 from lisp_export.lisp_project_builder import LispProjectBuilder
 from lisp_export.lisp_project_writer import LispProjectWriter
+from script_export.script_builder import ScriptBuilder
+from script_export.script_writer import ScriptWriter
 from snippet_export.snippet_builder import SnippetBuilder
 from snippet_export.snippet_writer import SnippetWriter
 from workbook.workbook_importer import WorkbookImporter
@@ -44,6 +49,7 @@ def parse_arguments() -> Namespace:
     parser.add_argument("--lisp-audio", help="Add a cue playing <Audio Effect>.wav for every audio effect to the lisp project.", action="store_true")
     parser.add_argument("--lisp-light", help="Add a cue jumping to the effect's cue on the MagicQ for every light effect to the lisp project.", action="store_true")
     parser.add_argument("--light-output", help="The CSV file listing the light cues to program into the MagicQ.", type=str)
+    parser.add_argument("--script-output", help="The script file (.json) for the script viewer, containing the blocks and all generated cues.", type=str)
     parser.add_argument("--magicq-playback", help="The MagicQ playback (1-10) holding the light cues (default: 1).", type=int, default=1)
     args = parser.parse_args()
 
@@ -80,10 +86,17 @@ if __name__ == "__main__":
         LightCueListWriter().write(light_cue_numbers, blocks, args.light_output)
         print(f"Wrote {len(light_cue_numbers)} light cues to '{args.light_output}'.")
 
+    snippet_numbers = snippet_builder.snippet_numbers(blocks)
+    lisp_project = None
     if args.lisp_output:
-        project = LispProjectBuilder(
-            LispCueFactory(), magicq, snippet_builder.snippet_numbers(blocks), light_cue_numbers,
+        lisp_project = LispProjectBuilder(
+            LispCueFactory(), magicq, snippet_numbers, light_cue_numbers,
             include_mutes=args.lisp_mutes, include_audio=args.lisp_audio, include_light=args.lisp_light,
         ).build(blocks)
-        LispProjectWriter().write(project, args.lisp_output)
-        print(f"Wrote {len(project['cues'])} cues to '{args.lisp_output}'.")
+        LispProjectWriter().write(lisp_project.data, args.lisp_output)
+        print(f"Wrote {len(lisp_project.cues)} cues to '{args.lisp_output}'.")
+
+    if args.script_output:
+        script = ScriptBuilder().build(blocks, snippets, snippet_numbers, light_cue_numbers, lisp_project)
+        ScriptWriter().write(script, args.script_output)
+        print(f"Wrote the script with {len(script.blocks)} blocks to '{args.script_output}'.")

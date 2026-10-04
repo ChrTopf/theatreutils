@@ -9,8 +9,9 @@ The following list of programs are used to prepare theater shows
    parses the output into an excel workbook.
 2. Cue generator: Reads the output of the previous application which has been slightly modified and generates all 
    necessary files for programming the decks and viewing the modified script.
-3. Script Viewer: Displays the modified script in a user interface together with mute annotations, audio and lighting 
-   commands. This application is intended to be used during the live theater show to read through the text in parallel.
+3. Script Viewer: Displays the script (JSON) exported by the cue generator in a user interface together with mute
+   annotations, audio and lighting commands. Next to every block, the generated LiSP cues, X32 snippets and light cues
+   are listed in three colored lanes whose names float at the top of the view. This application is intended to be used during the live theater show to read through the text in parallel.
 
 The entire process for preparing a show can be observed in the following diagram:
 ![Preparing a show](documentation/theatreutils-activity.svg)
@@ -72,6 +73,32 @@ The Blocks Sheet contains a table with the following columns:
 | Light | string | The name of the light effect to be played during this block |
 
 The table can contain additional columns which shall be ignored if the textbook is imported.
+
+### Script (JSON) Format
+The cue generator writes the script for the Script Viewer to the file given by `--script-output`. It contains the
+blocks of the workbook together with every cue generated for the decks. Each cue refers back to the block(s)
+triggering it by the block ID.
+
+```json
+{
+    "version": 1,
+    "blocks": [
+        {"id": 7, "type": "dialogue", "part": "1. Akt", "scene": 1, "page": 2, "text": "...", "character": "Hugo",
+         "direction": null, "mute": ["Ben"], "unmute": ["Anna"], "audio_effect": null, "light": "Spot Hugo"}
+    ],
+    "lisp_cues": [{"index": 4, "name": "1. Akt Scene 1 Block 7", "description": "Executes multiple actions at once", "block_id": 7}],
+    "x32_snippets": [{"number": 2, "name": "A1S1 B7", "block_id": 7}],
+    "light_cues": [{"cue": 2, "name": "Spot Hugo", "block_ids": [7, 19, 31]}]
+}
+```
+
+| Key | Description |
+| - | - |
+| `version` | The version of the format, currently `1` |
+| `blocks` | The blocks of the Blocks sheet with the same fields as its columns |
+| `lisp_cues` | Every cue of the `.lsp` project: its `index` in the LiSP cue list, `name`, `description` and `block_id`. Empty if no `--lisp-output` is given |
+| `x32_snippets` | Every generated snippet: its `number` on the X32 (= number of the `.snp` file), `name` and `block_id` |
+| `light_cues` | Every light cue: its MagicQ `cue` number, the light effect `name` and the `block_ids` triggering it |
 
 ### Behringer X32 Scenes
 Every time a block contains an actor to be muted / unmuted, another `.snp` file must be generated. The generated files

@@ -65,7 +65,7 @@ class SceneJumpBar(QWidget):
         self._position_label.setText(f"Page {block.page}  ·  Block {row + 1} / {self._block_count}")
 
     def show_empty_script(self) -> None:
-        self._position_label.setText("No blocks found in the workbook.")
+        self._position_label.setText("No blocks found in the script.")
 
     def _on_part_changed(self, part_index: int) -> None:
         self._fill_scenes(self._part_box.itemText(part_index))

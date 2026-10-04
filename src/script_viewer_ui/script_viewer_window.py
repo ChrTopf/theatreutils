@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget
 
-from model.block import Block
+from model.script import Script
 from script_viewer_ui import theme
 from script_viewer_ui.block_list_model import BlockListModel
 from script_viewer_ui.block_list_view import BlockListView
+from script_viewer_ui.cue_lanes import CueLaneLines
 from script_viewer_ui.scene_index import SceneIndex
 from script_viewer_ui.scene_jump_bar import SceneJumpBar
 
@@ -16,13 +17,13 @@ class ScriptViewerWindow(QMainWindow):
     while following the performance.
     """
 
-    def __init__(self, blocks: list[Block], title: str):
+    def __init__(self, script: Script, title: str):
         super().__init__()
         self.setWindowTitle(f"Script Viewer - {title}")
-        self._blocks = blocks
+        self._blocks = script.blocks
 
-        self._jump_bar = SceneJumpBar(SceneIndex(blocks), len(blocks))
-        self._view = BlockListView(BlockListModel(blocks, self))
+        self._jump_bar = SceneJumpBar(SceneIndex(self._blocks), len(self._blocks))
+        self._view = BlockListView(BlockListModel(self._blocks, CueLaneLines(script), self))
         self._jump_bar.scene_selected.connect(self._jump_to_row)
         self._view.current_row_changed.connect(self._update_position)
 
