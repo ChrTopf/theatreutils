@@ -3,11 +3,14 @@ from lisp_export.lisp_cue_factory import LispCueFactory
 from lisp_export.lisp_project import LispProject
 from light_export.magicq_osc import MagicQOsc
 from osc_routing.deck_routes import MAGICQ_ROUTE, X32_ROUTE
+from snippet_export.snippet_writer import FIRST_SNIPPET_NUMBER
 
 AUDIO_EXTENSION = ".wav"
 
-# OSC command of the X32 that recalls the snippet with the given number.
+# OSC command of the X32 that recalls the snippet in the given slot of the show.
 X32_SNIPPET_RECALL_PATH = "/-action/gosnippet"
+# The console's snippet slots start at 00, the snippet files at 001: file n lands in slot n - 1.
+X32_FIRST_SNIPPET_SLOT = 0
 
 # Everything around the cue list is taken over from a project saved by LiSP 0.6.5.
 PROJECT_META = {
@@ -101,12 +104,12 @@ class LispProjectBuilder:
             lines.append(f"Mute {', '.join(block.mute)}")
         if block.unmute:
             lines.append(f"Unmute {', '.join(block.unmute)}")
-        snippet_number = self.snippet_numbers[block.id]
+        snippet_slot = self.snippet_numbers[block.id] - FIRST_SNIPPET_NUMBER + X32_FIRST_SNIPPET_SLOT
         return self.cue_factory.osc_cue(
             name="",
             description=",\n".join(lines),
             path=f"/{X32_ROUTE}{X32_SNIPPET_RECALL_PATH}",
-            args=[self.cue_factory.osc_integer_arg(snippet_number)],
+            args=[self.cue_factory.osc_integer_arg(snippet_slot)],
         )
 
     def _audio_cue(self, block: Block) -> dict:

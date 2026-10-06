@@ -43,18 +43,21 @@ def parse_arguments() -> Namespace:
 
 def relay(listen_address: tuple[str, int], targets: dict[str, tuple[str, int]]) -> None:
     router = OscRouter(set(targets))
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as relay_socket:
-        relay_socket.bind(listen_address)
+    # A socket bound to the loopback address cannot send to the decks on the network,
+    # so the relay receives on one socket and sends on another, unbound one.
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as listen_socket, \
+            socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as relay_socket:
+        listen_socket.bind(listen_address)
         print(f"Relaying OSC from {listen_address[0]}:{listen_address[1]} to " +
               ", ".join(f"/{route} -> {host}:{port}" for route, (host, port) in targets.items()))
         while True:
-            packet, sender = relay_socket.recvfrom(MAX_PACKET_SIZE)
+            packet, sender = listen_socket.recvfrom(MAX_PACKET_SIZE)
             try:
                 routed = router.route(packet)
             except ValueError as error:
                 print(f"Dropped packet from {sender[0]}:{sender[1]}: {error}", file=sys.stderr)
                 continue
-            print(f"Routing message with topic '{routed.route}' to '{targets[routed.route]}'.")
+            print(f"Routing message {routed.packet} with topic '{routed.route}' to '{targets[routed.route]}'.")
             relay_socket.sendto(routed.packet, targets[routed.route])
 
 

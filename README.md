@@ -120,8 +120,9 @@ The project is written to the file given by `--lisp-output`.
 
 Connection to the decks (LiSP 0.6.5 sends all OSC cues to one global host, the OSC relay, see below). The first
 address segment of every OSC cue names the target deck (`/x32/...` or `/mq/...`):
-- Mute/unmute cues are OSC cues `/x32/-action/gosnippet <n>` that recall the X32 snippet with the same number as the
-  generated `.snp` file. Snippets are numbered from 1.
+- Mute/unmute cues are OSC cues `/x32/-action/gosnippet <slot>` that recall the X32 snippet generated as `.snp` file
+  number `<n>`. The files are numbered from 1, the console's snippet slots from 00, so file `n` must be loaded into
+  slot `n - 1` and the cue sends `<slot> = n - 1`.
 - Audio cues are media cues playing `<Audio Effect>.wav`, which is expected next to the `.lsp` file.
 - Light cues are OSC cues `/mq/pb/<playback>/<cue>` (no arguments) that make the ChamSys MagicQ jump to the cue
   (see https://docs.chamsys.co.uk/magicq/1.9.9.x/manual/OSC.html). The playback is set by `--magicq-playback`
