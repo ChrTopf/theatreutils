@@ -7,7 +7,7 @@ from osc_routing.deck_routes import MAGICQ_ROUTE, X32_ROUTE
 AUDIO_EXTENSION = ".wav"
 
 # OSC command of the X32 that recalls the snippet in the given slot of the show.
-X32_SNIPPET_RECALL_PATH = "/-action/gosnippet"
+X32_LOAD_PATH = "/load"
 
 # Everything around the cue list is taken over from a project saved by LiSP 0.6.5.
 PROJECT_META = {
@@ -105,8 +105,13 @@ class LispProjectBuilder:
         return self.cue_factory.osc_cue(
             name="",
             description=",\n".join(lines),
-            path=f"/{X32_ROUTE}{X32_SNIPPET_RECALL_PATH}",
-            args=[self.cue_factory.osc_integer_arg(snippet_slot)],
+            path=f"/{X32_ROUTE}{X32_LOAD_PATH}",
+            args=[
+                self.cue_factory.osc_string_arg("snippet"), 
+                self.cue_factory.osc_integer_arg(snippet_slot),
+                self.cue_factory.osc_integer_arg(0),
+                self.cue_factory.osc_integer_arg(0)
+            ],
         )
 
     def _audio_cue(self, block: Block) -> dict:

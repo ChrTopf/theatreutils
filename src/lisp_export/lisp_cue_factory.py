@@ -23,6 +23,10 @@ class LispCueFactory:
     @staticmethod
     def osc_integer_arg(value: int) -> dict:
         return {"end": 0, "fade": False, "start": value, "type": "Integer"}
+    
+    @staticmethod
+    def osc_string_arg(value: str) -> dict:
+        return {"end": None, "fade": False, "start": value, "type": "String"}
 
     def media_cue(self, name: str, description: str, uri: str) -> dict:
         """A cue playing the audio file `uri`, which LiSP resolves relative to the project file."""
