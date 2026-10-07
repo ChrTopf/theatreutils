@@ -43,9 +43,9 @@ class LispProjectBuilder:
     The first address segment tells the relay which deck the message is for,
     e.g. `/x32/-action/gosnippet` or `/mq/pb/1/5`, and is removed by it.
 
-    A block with a single action becomes a single cue. A block with several
-    actions becomes a collection cue that starts them at the same time, followed
-    by the actions themselves, whose names are prefixed with "--".
+    Every action of a block becomes a cue named after the block. If a block has
+    several actions, each of its cues but the last one triggers the next cue
+    right away (`TriggerAfterWait`), so a single GO executes all of them at once.
     """
 
     def __init__(self, cue_factory: LispCueFactory, magicq: MagicQOsc,
@@ -72,28 +72,19 @@ class LispProjectBuilder:
 
     def _block_cues(self, block: Block) -> list[dict]:
         block_name = f"{block.part} Scene {block.scene} Block {block.id}"
-        actions = self._action_cues(block, block_name)
-        if len(actions) <= 1:
-            return actions
-        collection = self.cue_factory.collection_cue(block_name, "Executes multiple actions at once", actions)
-        return [collection] + actions
-
-    def _action_cues(self, block: Block, block_name: str) -> list[dict]:
-        """The cues of the block's actions. Named after the block as long as they are its only action."""
         cues = []
         if self.include_mutes and block.id in self.snippet_numbers:
-            cues.append(("Mutes", self._mute_cue(block)))
+            cues.append(self._mute_cue(block))
         if self.include_audio and block.audio_effect:
-            cues.append(("Sound", self._audio_cue(block)))
+            cues.append(self._audio_cue(block))
         if self.include_light and block.light:
-            cues.append(("Light", self._light_cue(block)))
+            cues.append(self._light_cue(block))
 
-        if len(cues) == 1:
-            cues[0][1]["name"] = block_name
-        else:
-            for suffix, cue in cues:
-                cue["name"] = f"-- {block_name} {suffix}"
-        return [cue for _, cue in cues]
+        for cue in cues:
+            cue["name"] = block_name
+        for cue in cues[:-1]:
+            cue["next_action"] = "TriggerAfterWait"
+        return cues
 
     def _mute_cue(self, block: Block) -> dict:
         lines = []

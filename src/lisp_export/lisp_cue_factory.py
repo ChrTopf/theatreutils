@@ -60,15 +60,6 @@ class LispCueFactory:
         })
         return cue
 
-    def collection_cue(self, name: str, description: str, targets: list[dict]) -> dict:
-        """A cue that starts all `targets` at the same time."""
-        cue = self._base_cue("CollectionCue", name, description)
-        cue.update({
-            "duration": 0,
-            "targets": [[target["id"], "Default"] for target in targets],
-        })
-        return cue
-
     @staticmethod
     def _base_cue(cue_type: str, name: str, description: str) -> dict:
         return {
