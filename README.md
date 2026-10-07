@@ -11,7 +11,7 @@ The following list of programs are used to prepare theater shows
    necessary files for programming the decks and viewing the modified script.
 3. Script Viewer: Displays the script (JSON) exported by the cue generator in a user interface together with mute
    annotations, audio and lighting commands. Next to every block, the generated LiSP cues, X32 snippets and light cues
-   are listed in three colored lanes whose names float at the top of the view. This application is intended to be used during the live theater show to read through the text in parallel.
+   are shown. This application is intended to be used during the live theater show to read through the text in parallel.
 
 The entire process for preparing a show can be observed in the following diagram:
 ![Preparing a show](documentation/theatreutils-activity.svg)

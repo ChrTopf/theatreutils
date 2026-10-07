@@ -1,11 +1,12 @@
-from PyQt5.QtCore import QModelIndex, QRect, QRectF, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QColor, QFont, QFontMetrics, QKeyEvent, QPainter, QPaintEvent, QWheelEvent
+from PyQt5.QtCore import QModelIndex, Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QKeyEvent, QPainter, QPaintEvent, QWheelEvent
 from PyQt5.QtWidgets import QAbstractItemView, QListView
 
 from script_viewer_ui import theme
 from script_viewer_ui.block_delegate import BlockDelegate
 from script_viewer_ui.block_list_model import BlockListModel
-from script_viewer_ui.cue_lanes import LANES
+from script_viewer_ui.cue_lane_header import CueLaneHeader
+from script_viewer_ui.cue_lane_painter import CueLanePainter
 from script_viewer_ui.row_layout import RowLayout
 
 # One notch of a regular mouse wheel, see QWheelEvent.angleDelta().
@@ -20,9 +21,9 @@ class BlockListView(QListView):
     The scroll wheel and the arrow keys move the current block, which is always
     kept in the vertical center of the view. Clicking a block makes it current.
 
-    The names of the cue lanes float on top of the lanes at the upper edge of
-    the view. They are not part of any row, so they stay in place while the
-    blocks scroll by underneath.
+    The cue lanes right of the cards span many rows, so they are painted over
+    the whole viewport after the rows. Their names sit in a header above the
+    viewport, so they never cover the cue bars.
     """
 
     current_row_changed = pyqtSignal(int)
@@ -31,6 +32,7 @@ class BlockListView(QListView):
         super().__init__(parent)
         self._wheel_delta = 0
         self._delegate = BlockDelegate(self)
+        self._cue_lane_painter = CueLanePainter(model.cue_lanes)
         self.setModel(model)
         self.setItemDelegate(self._delegate)
 
@@ -42,6 +44,9 @@ class BlockListView(QListView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.setUniformItemSizes(False)
         self.setStyleSheet(_STYLE_SHEET)
+
+        self._header = CueLaneHeader(self)
+        self.setViewportMargins(0, self._header.height(), 0, 0)
 
         # Wrapped text changes its height whenever the width changes, so all cards have
         # to be re-measured - but only once the resizing has settled down.
@@ -61,6 +66,8 @@ class BlockListView(QListView):
             return
         self._block_model.set_current_row(row)
         self._center_current_row()
+        # The highlighted cues span far more rows than the two the model reports as changed.
+        self.viewport().update()
         self.current_row_changed.emit(row)
 
     def move_by(self, steps: int) -> None:
@@ -94,6 +101,8 @@ class BlockListView(QListView):
 
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
+        viewport = self.viewport().geometry()
+        self._header.setGeometry(viewport.x(), viewport.y() - self._header.height(), viewport.width(), self._header.height())
         self._relayout_timer.start()
         self._center_current_row()
 
@@ -101,31 +110,17 @@ class BlockListView(QListView):
         super().paintEvent(event)
         painter = QPainter(self.viewport())
         painter.setRenderHint(QPainter.Antialiasing)
-        self._paint_lane_labels(painter)
+        self._cue_lane_painter.paint(painter, RowLayout(0, self.viewport().width()), self.viewport().height(),
+                                     self._block_model.current_row, self._row_span)
 
     def scrollContentsBy(self, dx: int, dy: int) -> None:
-        # Scrolling moves the already painted pixels, which would drag the lane names along.
+        # Scrolling moves the already painted pixels, which would drag the sticky cue names along.
         super().scrollContentsBy(dx, dy)
         self.viewport().update()
 
-    def _paint_lane_labels(self, painter: QPainter) -> None:
-        font = QFont()
-        font.setPointSize(theme.LANE_LABEL_POINT_SIZE)
-        font.setBold(True)
-        painter.setFont(font)
-        metrics = QFontMetrics(font)
-        height = metrics.height() + theme.LANE_LABEL_PADDING
-        layout = RowLayout(0, self.viewport().width())
-
-        for lane_index, lane in enumerate(LANES):
-            lane_rect = layout.lane_rect(lane_index, theme.LANE_LABEL_MARGIN, height)
-            width = min(metrics.horizontalAdvance(lane.name) + 2 * theme.LANE_LABEL_PADDING, lane_rect.width())
-            label = QRect(lane_rect.center().x() - width // 2, lane_rect.y(), width, height)
-
-            painter.setPen(lane.color)
-            painter.setBrush(theme.LANE_LABEL_BACKGROUND)
-            painter.drawRoundedRect(QRectF(label).adjusted(0.5, 0.5, -0.5, -0.5), height / 2, height / 2)
-            painter.drawText(label, Qt.AlignCenter, metrics.elidedText(lane.name, Qt.ElideRight, width))
+    def _row_span(self, row: int) -> tuple[int, int]:
+        rect = self.visualRect(self._block_model.index(row))
+        return rect.top(), rect.top() + rect.height()
 
     def _on_clicked(self, index: QModelIndex) -> None:
         self.set_current_row(index.row())

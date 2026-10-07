@@ -29,6 +29,9 @@ LANE_WIDTH = 190
 LANE_GAP = 8
 LANE_LABEL_MARGIN = 8
 LANE_LABEL_PADDING = 8
+CUE_BAR_WIDTH = 4
+# How far a cue name keeps away from the upper edge of the view while it sticks to it.
+CUE_NAME_STICKY_MARGIN = 6
 
 # The page the block cards lie on.
 PAGE = QColor("#0d0d0f")
@@ -58,16 +61,26 @@ DIMMED_AUDIO_EFFECT = QColor("#356079")
 LIGHT = QColor("#ffe066")
 DIMMED_LIGHT = QColor("#7d7039")
 
-# The cue lanes: the line text, a faint tint of the whole lane and the floating lane name.
+# The cue lanes: the lane name in the header and a faint tint of the whole lane.
 LISP_LANE = QColor("#c39bff")
-DIMMED_LISP_LANE = QColor("#6a5590")
 X32_LANE = QColor("#4fd8c4")
-DIMMED_X32_LANE = QColor("#2f7a70")
 LIGHT_CUE_LANE = QColor("#ffb84d")
-DIMMED_LIGHT_CUE_LANE = QColor("#86653a")
 LANE_TINT_ALPHA = 22
-LANE_EDGE_ALPHA = 90
 LANE_LABEL_BACKGROUND = QColor(13, 13, 15, 235)
+
+# The cues within a lane take turns with these colors, so neighbouring cues differ.
+CUE_COLORS = (
+    QColor("#ff6b6b"),
+    QColor("#4dabf7"),
+    QColor("#ffd43b"),
+    QColor("#69db7c"),
+    QColor("#da77f2"),
+    QColor("#ff922b"),
+    QColor("#3bc9db"),
+    QColor("#f783ac"),
+)
+# Cues that are not active at the current block are darkened by this factor, see QColor.darker().
+DIMMED_CUE_FACTOR = 220
 
 # The bar above the page holding the scene navigation and the position.
 BAR = QColor("#16161a")
