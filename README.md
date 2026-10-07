@@ -120,9 +120,8 @@ The project is written to the file given by `--lisp-output`.
 
 Connection to the decks (LiSP 0.6.5 sends all OSC cues to one global host, the OSC relay, see below). The first
 address segment of every OSC cue names the target deck (`/x32/...` or `/mq/...`):
-- Mute/unmute cues are OSC cues `/x32/-action/gosnippet <slot>` that recall the X32 snippet generated as `.snp` file
-  number `<n>`. The files are numbered from 1, the console's snippet slots from 00, so file `n` must be loaded into
-  slot `n - 1` and the cue sends `<slot> = n - 1`.
+- Mute/unmute cues are OSC cues that recall the X32 snippet generated as `.snp` file. 
+  The files are numbered from 1, the console's internal snippet slot numbering starts from 00.
 - Audio cues are media cues playing `<Audio Effect>.wav`, which is expected next to the `.lsp` file.
 - Light cues are OSC cues `/mq/pb/<playback>/<cue>` (no arguments) that make the ChamSys MagicQ jump to the cue
   (see https://docs.chamsys.co.uk/magicq/1.9.9.x/manual/OSC.html). The playback is set by `--magicq-playback`
@@ -130,4 +129,3 @@ address segment of every OSC cue names the target deck (`/x32/...` or `/mq/...`)
   Every light effect name gets one MagicQ cue number (numbered from 1 in order of first appearance, reused if the
   effect occurs again). The list of cues to program into the desk is written as CSV (`Cue`, `Effect`, `Blocks`) to
   the file given by `--light-output`.
-- No MIDI cues are generated: the MidiCue settings page of LiSP 0.6.5 crashes on SysEx (e.g. MSC) messages.
