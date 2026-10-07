@@ -8,8 +8,9 @@ from PyQt5.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
 
 from model.block import Block
 from script_viewer_ui import theme
-from script_viewer_ui.block_list_model import BLOCK_ROLE, CUE_NAME_COUNT_ROLE, IS_CURRENT_ROLE
+from script_viewer_ui.block_list_model import BLOCK_ROLE, IS_CURRENT_ROLE
 from script_viewer_ui.cue_lane_painter import cue_name_font
+from script_viewer_ui.cue_lanes import LANES, CueLane, CueLaneSegments
 from script_viewer_ui.row_layout import RowLayout
 
 UNMUTE_PREFIX = "▲ "
@@ -33,14 +34,21 @@ class BlockDelegate(QStyledItemDelegate):
     or stage direction, the right column holds the mic, audio and light cues of
     the block. The cue lanes right of the card span many rows, so they are
     painted by the BlockListView; the card only grows tall enough for the cue
-    names it starts. The current block is drawn in white on a lighter card with
+    names it starts in the visible lanes. The current block is drawn in white on a lighter card with
     a border, every other block is dimmed.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, cue_lanes: CueLaneSegments, parent=None):
         super().__init__(parent)
+        self._cue_lanes = cue_lanes
+        self._visible_lanes = LANES
         self._viewport_width = 0
         self._card_heights: dict[tuple[int, int], int] = {}
+
+    def set_visible_lanes(self, lanes: tuple[CueLane, ...]) -> None:
+        """Tells the delegate which cue lanes share the row with the cards, which changes their width and height."""
+        self._visible_lanes = lanes
+        self._card_heights.clear()
 
     def set_viewport_width(self, width: int) -> bool:
         """Tells the delegate how wide the cards may be. Returns True if that changed the layout."""
@@ -68,7 +76,7 @@ class BlockDelegate(QStyledItemDelegate):
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         block = index.data(BLOCK_ROLE)
-        cue_name_count = index.data(CUE_NAME_COUNT_ROLE)
+        cue_name_count = self._cue_lanes.name_count(index.row(), self._visible_lanes)
         card_width = self._row_layout(option.rect).card_width
         key = (block.id, card_width)
         if key not in self._card_heights:
@@ -113,7 +121,7 @@ class BlockDelegate(QStyledItemDelegate):
         return math.ceil(max(text_height, cue_height, cue_name_height)) + 2 * theme.BLOCK_PADDING
 
     def _row_layout(self, row: QRect) -> RowLayout:
-        return RowLayout(row.x(), row.width() or self._viewport_width)
+        return RowLayout(row.x(), row.width() or self._viewport_width, self._visible_lanes)
 
     @staticmethod
     def _columns(card_width: int) -> _Columns:

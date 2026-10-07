@@ -7,6 +7,7 @@ from script_viewer_ui.block_delegate import BlockDelegate
 from script_viewer_ui.block_list_model import BlockListModel
 from script_viewer_ui.cue_lane_header import CueLaneHeader
 from script_viewer_ui.cue_lane_painter import CueLanePainter
+from script_viewer_ui.cue_lanes import LANES, CueLane
 from script_viewer_ui.row_layout import RowLayout
 
 # One notch of a regular mouse wheel, see QWheelEvent.angleDelta().
@@ -23,7 +24,8 @@ class BlockListView(QListView):
 
     The cue lanes right of the cards span many rows, so they are painted over
     the whole viewport after the rows. Their names sit in a header above the
-    viewport, so they never cover the cue bars.
+    viewport, so they never cover the cue bars. Hidden lanes make room for
+    wider cards; if all lanes are hidden, so is the header.
     """
 
     current_row_changed = pyqtSignal(int)
@@ -31,7 +33,8 @@ class BlockListView(QListView):
     def __init__(self, model: BlockListModel, parent=None):
         super().__init__(parent)
         self._wheel_delta = 0
-        self._delegate = BlockDelegate(self)
+        self._visible_lanes = LANES
+        self._delegate = BlockDelegate(model.cue_lanes, self)
         self._cue_lane_painter = CueLanePainter(model.cue_lanes)
         self.setModel(model)
         self.setItemDelegate(self._delegate)
@@ -46,7 +49,7 @@ class BlockListView(QListView):
         self.setStyleSheet(_STYLE_SHEET)
 
         self._header = CueLaneHeader(self)
-        self.setViewportMargins(0, self._header.height(), 0, 0)
+        self._update_header_margin()
 
         # Wrapped text changes its height whenever the width changes, so all cards have
         # to be re-measured - but only once the resizing has settled down.
@@ -69,6 +72,16 @@ class BlockListView(QListView):
         # The highlighted cues span far more rows than the two the model reports as changed.
         self.viewport().update()
         self.current_row_changed.emit(row)
+
+    def set_visible_lanes(self, lanes: tuple[CueLane, ...]) -> None:
+        self._visible_lanes = lanes
+        self._delegate.set_visible_lanes(lanes)
+        self._header.set_visible_lanes(lanes)
+        self._update_header_margin()
+        # The cards change their width and with it the height of their wrapped text.
+        self.scheduleDelayedItemsLayout()
+        self._center_current_row()
+        self.viewport().update()
 
     def move_by(self, steps: int) -> None:
         self.set_current_row(self._block_model.current_row + steps)
@@ -101,8 +114,7 @@ class BlockListView(QListView):
 
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
-        viewport = self.viewport().geometry()
-        self._header.setGeometry(viewport.x(), viewport.y() - self._header.height(), viewport.width(), self._header.height())
+        self._place_header()
         self._relayout_timer.start()
         self._center_current_row()
 
@@ -110,13 +122,23 @@ class BlockListView(QListView):
         super().paintEvent(event)
         painter = QPainter(self.viewport())
         painter.setRenderHint(QPainter.Antialiasing)
-        self._cue_lane_painter.paint(painter, RowLayout(0, self.viewport().width()), self.viewport().height(),
+        self._cue_lane_painter.paint(painter, RowLayout(0, self.viewport().width(), self._visible_lanes),
+                                     self.viewport().height(),
                                      self._block_model.current_row, self._row_span)
 
     def scrollContentsBy(self, dx: int, dy: int) -> None:
         # Scrolling moves the already painted pixels, which would drag the sticky cue names along.
         super().scrollContentsBy(dx, dy)
         self.viewport().update()
+
+    def _update_header_margin(self) -> None:
+        self._header.setVisible(bool(self._visible_lanes))
+        self.setViewportMargins(0, self._header.height() if self._visible_lanes else 0, 0, 0)
+        self._place_header()
+
+    def _place_header(self) -> None:
+        viewport = self.viewport().geometry()
+        self._header.setGeometry(viewport.x(), viewport.y() - self._header.height(), viewport.width(), self._header.height())
 
     def _row_span(self, row: int) -> tuple[int, int]:
         rect = self.visualRect(self._block_model.index(row))

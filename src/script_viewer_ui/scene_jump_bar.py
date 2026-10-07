@@ -3,11 +3,12 @@ from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QWidget
 
 from model.block import Block
 from script_viewer_ui import theme
+from script_viewer_ui.cue_lane_toggles import CueLaneToggles
 from script_viewer_ui.scene_index import SceneIndex
 
 
 class SceneJumpBar(QWidget):
-    """The bar above the document: jump to a scene of a part, and the current position.
+    """The bar above the document: jump to a scene of a part, show or hide the cue lanes, and the current position.
 
     Picking a part jumps to its first scene, picking a scene jumps to its first
     block. Both selectors also follow along while the show is being read, so
@@ -16,7 +17,7 @@ class SceneJumpBar(QWidget):
 
     scene_selected = pyqtSignal(int)
 
-    def __init__(self, index: SceneIndex, block_count: int, parent=None):
+    def __init__(self, index: SceneIndex, block_count: int, lane_toggles: CueLaneToggles, parent=None):
         super().__init__(parent)
         self._index = index
         self._block_count = block_count
@@ -46,6 +47,8 @@ class SceneJumpBar(QWidget):
         layout.addWidget(QLabel("Scene"))
         layout.addWidget(self._scene_box)
         layout.addStretch()
+        layout.addWidget(lane_toggles)
+        layout.addSpacing(16)
         layout.addWidget(self._position_label)
 
         self.setStyleSheet(_STYLE_SHEET)

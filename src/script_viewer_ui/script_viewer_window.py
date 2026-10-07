@@ -4,13 +4,14 @@ from model.script import Script
 from script_viewer_ui import theme
 from script_viewer_ui.block_list_model import BlockListModel
 from script_viewer_ui.block_list_view import BlockListView
+from script_viewer_ui.cue_lane_toggles import CueLaneToggles
 from script_viewer_ui.cue_lanes import CueLaneSegments
 from script_viewer_ui.scene_index import SceneIndex
 from script_viewer_ui.scene_jump_bar import SceneJumpBar
 
 
 class ScriptViewerWindow(QMainWindow):
-    """Main window of the Script Viewer: the scene jump bar above the script document.
+    """Main window of the Script Viewer: the scene jump bar with the cue lane toggles above the script document.
 
     The bar tells where in the show the current block is located and jumps to
     any scene of any part, so the position can be read and changed at a glance
@@ -22,8 +23,10 @@ class ScriptViewerWindow(QMainWindow):
         self.setWindowTitle(f"Script Viewer - {title}")
         self._blocks = script.blocks
 
-        self._jump_bar = SceneJumpBar(SceneIndex(self._blocks), len(self._blocks))
+        lane_toggles = CueLaneToggles()
+        self._jump_bar = SceneJumpBar(SceneIndex(self._blocks), len(self._blocks), lane_toggles)
         self._view = BlockListView(BlockListModel(self._blocks, CueLaneSegments(script), self))
+        lane_toggles.visible_lanes_changed.connect(self._view.set_visible_lanes)
         self._jump_bar.scene_selected.connect(self._jump_to_row)
         self._view.current_row_changed.connect(self._update_position)
 

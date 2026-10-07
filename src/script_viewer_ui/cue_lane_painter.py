@@ -4,7 +4,7 @@ from PyQt5.QtCore import QRect, QRectF, Qt
 from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter
 
 from script_viewer_ui import theme
-from script_viewer_ui.cue_lanes import LANES, CueLaneSegments, CueSegment
+from script_viewer_ui.cue_lanes import CueLaneSegments, CueSegment
 from script_viewer_ui.row_layout import RowLayout
 
 # Tells the painter where a row is: its top and bottom edge in viewport coordinates.
@@ -18,7 +18,7 @@ def cue_name_font() -> QFont:
 
 
 class CueLanePainter:
-    """Paints the cue lanes right of the block cards: one colored bar per cue with its name beside it.
+    """Paints the visible cue lanes right of the block cards: one colored bar per cue with its name beside it.
 
     A bar runs down from the block triggering the cue to the block before the
     next cue of the lane. The name starts at the top of the bar, but sticks to
@@ -36,9 +36,9 @@ class CueLanePainter:
         painter.setFont(font)
         metrics = QFontMetrics(font)
 
-        for lane_index in range(len(LANES)):
-            lane_rect = layout.lane_rect(lane_index, 0, viewport_height)
-            for segment in self._cue_lanes.of_lane(lane_index):
+        for lane in layout.lanes:
+            lane_rect = layout.lane_rect(lane, 0, viewport_height)
+            for segment in self._cue_lanes.of_lane(lane):
                 top = row_span(segment.first_row)[0]
                 # Rows end with the spacing below their card, which the bar leaves out like the card does.
                 bottom = row_span(segment.last_row)[1] - theme.BLOCK_SPACING

@@ -3,12 +3,12 @@ from PyQt5.QtGui import QFont, QFontMetrics, QPainter, QPaintEvent
 from PyQt5.QtWidgets import QWidget
 
 from script_viewer_ui import theme
-from script_viewer_ui.cue_lanes import LANES
+from script_viewer_ui.cue_lanes import LANES, CueLane
 from script_viewer_ui.row_layout import RowLayout
 
 
 class CueLaneHeader(QWidget):
-    """The strip above the document holding the names of the cue lanes, each one centered over its lane.
+    """The strip above the document holding the names of the visible cue lanes, each one centered over its lane.
 
     It lies outside of the scrolled area, so the names never cover the cue bars.
     Its width has to match the viewport of the document, so the RowLayout puts
@@ -22,6 +22,11 @@ class CueLaneHeader(QWidget):
         self._font.setBold(True)
         self._label_height = QFontMetrics(self._font).height() + theme.LANE_LABEL_PADDING
         self.setFixedHeight(self._label_height + 2 * theme.LANE_LABEL_MARGIN)
+        self._visible_lanes = LANES
+
+    def set_visible_lanes(self, lanes: tuple[CueLane, ...]) -> None:
+        self._visible_lanes = lanes
+        self.update()
 
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
@@ -29,11 +34,11 @@ class CueLaneHeader(QWidget):
         painter.fillRect(self.rect(), theme.PAGE)
         painter.setFont(self._font)
         metrics = QFontMetrics(self._font)
-        layout = RowLayout(0, self.width())
+        layout = RowLayout(0, self.width(), self._visible_lanes)
         radius = self._label_height / 2
 
-        for lane_index, lane in enumerate(LANES):
-            lane_rect = layout.lane_rect(lane_index, theme.LANE_LABEL_MARGIN, self._label_height)
+        for lane in layout.lanes:
+            lane_rect = layout.lane_rect(lane, theme.LANE_LABEL_MARGIN, self._label_height)
             width = min(metrics.horizontalAdvance(lane.name) + 2 * theme.LANE_LABEL_PADDING, lane_rect.width())
             label = QRect(lane_rect.center().x() - width // 2, lane_rect.y(), width, self._label_height)
 

@@ -5,11 +5,9 @@ from PyQt5.QtCore import QAbstractListModel, QModelIndex, Qt
 from model.block import Block
 from script_viewer_ui.cue_lanes import CueLaneSegments
 
-# Custom roles exposing the whole Block of a row, whether it is the current one and
-# how many cue names it starts in the busiest cue lane to the BlockDelegate.
+# Custom roles exposing the whole Block of a row and whether it is the current one to the BlockDelegate.
 BLOCK_ROLE = Qt.UserRole + 1
 IS_CURRENT_ROLE = Qt.UserRole + 2
-CUE_NAME_COUNT_ROLE = Qt.UserRole + 3
 
 
 class BlockListModel(QAbstractListModel):
@@ -55,8 +53,6 @@ class BlockListModel(QAbstractListModel):
             return self._blocks[index.row()]
         if role == IS_CURRENT_ROLE:
             return index.row() == self._current_row
-        if role == CUE_NAME_COUNT_ROLE:
-            return self._cue_lanes.name_count(index.row())
         return None
 
     def _emit_row_changed(self, row: int) -> None:

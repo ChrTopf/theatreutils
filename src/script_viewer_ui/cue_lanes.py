@@ -65,12 +65,12 @@ class CueLaneSegments:
 
         self._segments = tuple(self._build_segments(names_by_row) for names_by_row in self._names)
 
-    def of_lane(self, lane_index: int) -> list[CueSegment]:
-        return self._segments[lane_index]
+    def of_lane(self, lane: CueLane) -> list[CueSegment]:
+        return self._segments[LANES.index(lane)]
 
-    def name_count(self, row: int) -> int:
-        """The most cue names any lane starts at the row, which the row has to be tall enough for."""
-        return max((len(names_by_row.get(row, [])) for names_by_row in self._names), default=0)
+    def name_count(self, row: int, lanes: tuple[CueLane, ...]) -> int:
+        """The most cue names any of the lanes starts at the row, which the row has to be tall enough for."""
+        return max((len(self._names[LANES.index(lane)].get(row, [])) for lane in lanes), default=0)
 
     def _add(self, block_id: int, lane: CueLane, name: str) -> None:
         row = self._rows_of_blocks.get(block_id)
