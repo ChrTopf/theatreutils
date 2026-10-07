@@ -9,7 +9,7 @@
             },
             "default_start_action": "FadeInStart",
             "default_stop_action": "FadeOutStop",
-            "description": "This is an example of a cue with only an audio effect",
+            "description": "Audio Effect Cue",
             "duration": 1175,
             "fadein_duration": 0.0,
             "fadein_type": "Linear",
@@ -39,7 +39,7 @@
                         "band9": 0
                     },
                     "UriInput": {
-                        "_mtime": 1791021359.0,
+                        "_mtime": 1791397839.8694322,
                         "buffer_size": -1,
                         "download": false,
                         "duration": 1175,
@@ -87,7 +87,7 @@
                 {
                     "end": 0,
                     "fade": false,
-                    "start": 1,
+                    "start": 0,
                     "type": "Integer"
                 },
                 {
@@ -110,7 +110,7 @@
             },
             "default_start_action": "Start",
             "default_stop_action": "Stop",
-            "description": "This is an example of a cue, which just sets the X32 scene",
+            "description": "X32 snippet cue",
             "duration": 0.0,
             "fade_type": "Linear",
             "fadein_duration": 0.0,
@@ -142,7 +142,7 @@
             },
             "default_start_action": "Start",
             "default_stop_action": "Stop",
-            "description": "This is an example of a cue that just sets the light cue of the MagicQ console",
+            "description": "MagicQ Light Cue",
             "duration": 0.0,
             "fade_type": "Linear",
             "fadein_duration": 0.0,
@@ -157,6 +157,195 @@
             "post_wait": 0.0,
             "pre_wait": 0.0,
             "stylesheet": "font-size:10pt;",
+            "timecode": {
+                "enabled": false,
+                "replace_hours": false,
+                "track": 0
+            },
+            "triggers": {}
+        },
+        {
+            "_type_": "OscCue",
+            "args": [
+                {
+                    "end": null,
+                    "fade": false,
+                    "start": "snippet",
+                    "type": "String"
+                },
+                {
+                    "end": 0,
+                    "fade": false,
+                    "start": 1,
+                    "type": "Integer"
+                },
+                {
+                    "end": 0,
+                    "fade": false,
+                    "start": 0,
+                    "type": "Integer"
+                },
+                {
+                    "end": 0,
+                    "fade": false,
+                    "start": 0,
+                    "type": "Integer"
+                }
+            ],
+            "controller": {
+                "keyboard": [],
+                "midi": [],
+                "osc": []
+            },
+            "default_start_action": "Start",
+            "default_stop_action": "Stop",
+            "description": "X32 Snippet Cue",
+            "duration": 0.0,
+            "fade_type": "Linear",
+            "fadein_duration": 0.0,
+            "fadein_type": "Linear",
+            "fadeout_duration": 0.0,
+            "fadeout_type": "Linear",
+            "id": "037084ec-c461-4ee8-ab69-47242745eec0",
+            "index": 3,
+            "name": "1. Akt Szene 2 Block 10",
+            "next_action": "TriggerAfterWait",
+            "path": "/load",
+            "post_wait": 0.0,
+            "pre_wait": 0.0,
+            "stylesheet": "font-size:11pt;",
+            "timecode": {
+                "enabled": false,
+                "replace_hours": false,
+                "track": 0
+            },
+            "triggers": {}
+        },
+        {
+            "_type_": "GstMediaCue",
+            "controller": {
+                "keyboard": [],
+                "midi": [],
+                "osc": []
+            },
+            "default_start_action": "FadeInStart",
+            "default_stop_action": "FadeOutStop",
+            "description": "Audio Effect Cue",
+            "duration": 1175,
+            "fadein_duration": 0.0,
+            "fadein_type": "Linear",
+            "fadeout_duration": 0.0,
+            "fadeout_type": "Linear",
+            "id": "0c3f16c7-215f-4914-9f2b-0ed2d398412d",
+            "index": 4,
+            "media": {
+                "duration": 1175,
+                "elements": {
+                    "AutoSink": {},
+                    "DbMeter": {
+                        "interval": 33000000,
+                        "peak_falloff": 20,
+                        "peak_ttl": 1000000000
+                    },
+                    "Equalizer10": {
+                        "band0": 0,
+                        "band1": 0,
+                        "band2": 0,
+                        "band3": 0,
+                        "band4": 0,
+                        "band5": 0,
+                        "band6": 0,
+                        "band7": 0,
+                        "band8": 0,
+                        "band9": 0
+                    },
+                    "UriInput": {
+                        "_mtime": 1791397839.8694322,
+                        "buffer_size": -1,
+                        "download": false,
+                        "duration": 1175,
+                        "uri": "mac-quack.mp3",
+                        "use_buffering": false
+                    },
+                    "Volume": {
+                        "mute": false,
+                        "normal_volume": 1.0,
+                        "volume": 1.0
+                    }
+                },
+                "loop": 0,
+                "pipe": [
+                    "UriInput",
+                    "Volume",
+                    "Equalizer10",
+                    "DbMeter",
+                    "AutoSink"
+                ],
+                "start_time": 0,
+                "stop_time": 0
+            },
+            "name": "1. Akt Szene 2 Block 10",
+            "next_action": "DoNothing",
+            "post_wait": 0.0,
+            "pre_wait": 0.0,
+            "stylesheet": "font-size:11pt;",
+            "timecode": {
+                "enabled": false,
+                "replace_hours": false,
+                "track": 0
+            },
+            "triggers": {}
+        },
+        {
+            "_type_": "OscCue",
+            "args": [
+                {
+                    "end": null,
+                    "fade": false,
+                    "start": "snippet",
+                    "type": "String"
+                },
+                {
+                    "end": 0,
+                    "fade": false,
+                    "start": 2,
+                    "type": "Integer"
+                },
+                {
+                    "end": 0,
+                    "fade": false,
+                    "start": 0,
+                    "type": "Integer"
+                },
+                {
+                    "end": 0,
+                    "fade": false,
+                    "start": 0,
+                    "type": "Integer"
+                }
+            ],
+            "controller": {
+                "keyboard": [],
+                "midi": [],
+                "osc": []
+            },
+            "default_start_action": "Start",
+            "default_stop_action": "Stop",
+            "description": "",
+            "duration": 0.0,
+            "fade_type": "Linear",
+            "fadein_duration": 0.0,
+            "fadein_type": "Linear",
+            "fadeout_duration": 0.0,
+            "fadeout_type": "Linear",
+            "id": "b4daa52b-9e0c-495d-bacb-638a50d3aca3",
+            "index": 5,
+            "name": "1. Akt Szene 3 Block 20",
+            "next_action": "DoNothing",
+            "path": "/load",
+            "post_wait": 0.0,
+            "pre_wait": 0.0,
+            "stylesheet": "font-size:11pt;",
             "timecode": {
                 "enabled": false,
                 "replace_hours": false,
@@ -197,17 +386,17 @@
             "selection_mode": false,
             "view_sizes": [
                 [
-                    293,
-                    1039
+                    205,
+                    727
                 ],
                 [
-                    280,
-                    1703,
-                    559
+                    210,
+                    1274,
+                    418
                 ],
                 [
-                    1986,
-                    560
+                    1487,
+                    419
                 ]
             ]
         },
