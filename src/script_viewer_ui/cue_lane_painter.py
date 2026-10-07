@@ -36,12 +36,8 @@ class CueLanePainter:
         painter.setFont(font)
         metrics = QFontMetrics(font)
 
-        for lane_index, lane in enumerate(LANES):
+        for lane_index in range(len(LANES)):
             lane_rect = layout.lane_rect(lane_index, 0, viewport_height)
-            tint = QColor(lane.color)
-            tint.setAlpha(theme.LANE_TINT_ALPHA)
-            painter.fillRect(lane_rect, tint)
-
             for segment in self._cue_lanes.of_lane(lane_index):
                 top = row_span(segment.first_row)[0]
                 # Rows end with the spacing below their card, which the bar leaves out like the card does.

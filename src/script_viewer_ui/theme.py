@@ -61,11 +61,10 @@ DIMMED_AUDIO_EFFECT = QColor("#356079")
 LIGHT = QColor("#ffe066")
 DIMMED_LIGHT = QColor("#7d7039")
 
-# The cue lanes: the lane name in the header and a faint tint of the whole lane.
+# The cue lanes: the color of the lane name in the header.
 LISP_LANE = QColor("#c39bff")
 X32_LANE = QColor("#4fd8c4")
 LIGHT_CUE_LANE = QColor("#ffb84d")
-LANE_TINT_ALPHA = 22
 LANE_LABEL_BACKGROUND = QColor(13, 13, 15, 235)
 
 # The cues within a lane take turns with these colors, so neighbouring cues differ.
