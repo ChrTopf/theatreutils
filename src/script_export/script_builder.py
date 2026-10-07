@@ -35,7 +35,7 @@ class ScriptBuilder:
     @staticmethod
     def _snippets(snippets: list[X32Snippet], snippet_numbers: dict[int, int]) -> list[SnippetEntry]:
         """Both the snippets and their numbers are in play order, see SnippetBuilder."""
-        return [SnippetEntry(number=number, name=snippet.name, block_id=block_id)
+        return [SnippetEntry(number=number + 1, name=snippet.name, block_id=block_id)
                 for (block_id, number), snippet in zip(snippet_numbers.items(), snippets)]
 
     @staticmethod

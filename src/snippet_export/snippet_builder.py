@@ -2,7 +2,6 @@ import re
 
 from model.actor import Actor
 from model.block import Block
-from snippet_export.snippet_writer import FIRST_SNIPPET_NUMBER
 from snippet_export.x32_snippet import X32Snippet
 
 PART_NUMBER_REGEX = re.compile(r"\d+")
@@ -27,7 +26,7 @@ class SnippetBuilder:
 
     def snippet_numbers(self, blocks: list[Block]) -> dict[int, int]:
         """Maps the ID of every block yielding a snippet to the snippet's number, as written by SnippetWriter."""
-        return {block.id: number for number, block in enumerate(self._mic_change_blocks(blocks), start=FIRST_SNIPPET_NUMBER)}
+        return {block.id: number for number, block in enumerate(self._mic_change_blocks(blocks))}
 
     @staticmethod
     def _mic_change_blocks(blocks: list[Block]) -> list[Block]:
