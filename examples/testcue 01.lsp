@@ -1,127 +1,6 @@
 {
     "cues": [
         {
-            "_type_": "OscCue",
-            "args": [
-                {
-                    "end": null,
-                    "fade": false,
-                    "start": "VS2 B14",
-                    "type": "String"
-                }
-            ],
-            "controller": {
-                "keyboard": [],
-                "midi": [],
-                "osc": []
-            },
-            "default_start_action": "Start",
-            "default_stop_action": "Stop",
-            "description": "Mute Lisa,\nUnmute Beate",
-            "duration": 0.0,
-            "fade_type": "Linear",
-            "fadein_duration": 0.0,
-            "fadein_type": "Linear",
-            "fadeout_duration": 0.0,
-            "fadeout_type": "Linear",
-            "id": "d35601ba-f590-46b1-9ae7-e48b736c68c4",
-            "index": 0,
-            "name": "Vorspann Scene 2 Block 14",
-            "next_action": "DoNothing",
-            "path": "/next/scene",
-            "post_wait": 0.0,
-            "pre_wait": 0.0,
-            "stylesheet": "background:#ffffff;color:#000000;font-size:11pt;",
-            "timecode": {
-                "enabled": false,
-                "replace_hours": false,
-                "track": 0
-            },
-            "triggers": {}
-        },
-        {
-            "_type_": "CollectionCue",
-            "controller": {
-                "keyboard": [],
-                "midi": [],
-                "osc": []
-            },
-            "default_start_action": "Start",
-            "default_stop_action": "Stop",
-            "description": "Executes multiple actions at once",
-            "duration": 0,
-            "fadein_duration": 0.0,
-            "fadein_type": "Linear",
-            "fadeout_duration": 0.0,
-            "fadeout_type": "Linear",
-            "id": "00c2d154-890c-4886-80c8-93cb48a83913",
-            "index": 1,
-            "name": "Akt 1 Scene 1 Block 30",
-            "next_action": "DoNothing",
-            "post_wait": 0.0,
-            "pre_wait": 0.0,
-            "stylesheet": "font-size:11pt;",
-            "targets": [
-                [
-                    "72c8efea-673c-459e-b5ca-ee4f7baac614",
-                    "Default"
-                ],
-                [
-                    "661b45aa-80f2-40d7-8f24-1ea9e43ec9c0",
-                    "Default"
-                ],
-                [
-                    "f42250af-7520-49fa-986a-b972dae1d50d",
-                    "Default"
-                ]
-            ],
-            "timecode": {
-                "enabled": false,
-                "replace_hours": false,
-                "track": 0
-            },
-            "triggers": {}
-        },
-        {
-            "_type_": "OscCue",
-            "args": [
-                {
-                    "end": 0,
-                    "fade": false,
-                    "start": 1,
-                    "type": "Integer"
-                }
-            ],
-            "controller": {
-                "keyboard": [],
-                "midi": [],
-                "osc": []
-            },
-            "default_start_action": "Start",
-            "default_stop_action": "Stop",
-            "description": "Mute Beate,\nUnmute Lisa",
-            "duration": 0.0,
-            "fade_type": "Linear",
-            "fadein_duration": 0.0,
-            "fadein_type": "Linear",
-            "fadeout_duration": 0.0,
-            "fadeout_type": "Linear",
-            "id": "72c8efea-673c-459e-b5ca-ee4f7baac614",
-            "index": 2,
-            "name": "-- Akt 1 Scene 1 Block 30 Mutes",
-            "next_action": "DoNothing",
-            "path": "/send/osc/command/here",
-            "post_wait": 0.0,
-            "pre_wait": 0.0,
-            "stylesheet": "font-size:11pt;",
-            "timecode": {
-                "enabled": false,
-                "replace_hours": false,
-                "track": 0
-            },
-            "triggers": {}
-        },
-        {
             "_type_": "GstMediaCue",
             "controller": {
                 "keyboard": [],
@@ -130,14 +9,14 @@
             },
             "default_start_action": "FadeInStart",
             "default_stop_action": "FadeOutStop",
-            "description": "Play some audio effect",
+            "description": "This is an example of a cue with only an audio effect",
             "duration": 1175,
             "fadein_duration": 0.0,
             "fadein_type": "Linear",
             "fadeout_duration": 0.0,
             "fadeout_type": "Linear",
-            "id": "661b45aa-80f2-40d7-8f24-1ea9e43ec9c0",
-            "index": 3,
+            "id": "865fba99-c158-45d9-9f70-2e51340856b4",
+            "index": 0,
             "media": {
                 "duration": 1175,
                 "elements": {
@@ -160,7 +39,7 @@
                         "band9": 0
                     },
                     "UriInput": {
-                        "_mtime": 1791021359.4770043,
+                        "_mtime": 1791021359.0,
                         "buffer_size": -1,
                         "download": false,
                         "duration": 1175,
@@ -184,11 +63,68 @@
                 "start_time": 0,
                 "stop_time": 0
             },
-            "name": "-- Akt 1 Scene 1 Block 30 Sound",
+            "name": "1. Akt Szene 1 Block 2",
             "next_action": "DoNothing",
             "post_wait": 0.0,
             "pre_wait": 0.0,
-            "stylesheet": "font-size:11pt;",
+            "stylesheet": "font-size:10pt;",
+            "timecode": {
+                "enabled": false,
+                "replace_hours": false,
+                "track": 0
+            },
+            "triggers": {}
+        },
+        {
+            "_type_": "OscCue",
+            "args": [
+                {
+                    "end": null,
+                    "fade": false,
+                    "start": "snippet",
+                    "type": "String"
+                },
+                {
+                    "end": 0,
+                    "fade": false,
+                    "start": 1,
+                    "type": "Integer"
+                },
+                {
+                    "end": 0,
+                    "fade": false,
+                    "start": 0,
+                    "type": "Integer"
+                },
+                {
+                    "end": 0,
+                    "fade": false,
+                    "start": 0,
+                    "type": "Integer"
+                }
+            ],
+            "controller": {
+                "keyboard": [],
+                "midi": [],
+                "osc": []
+            },
+            "default_start_action": "Start",
+            "default_stop_action": "Stop",
+            "description": "This is an example of a cue, which just sets the X32 scene",
+            "duration": 0.0,
+            "fade_type": "Linear",
+            "fadein_duration": 0.0,
+            "fadein_type": "Linear",
+            "fadeout_duration": 0.0,
+            "fadeout_type": "Linear",
+            "id": "90a476e4-e3c5-4eb4-8891-b1c128407901",
+            "index": 1,
+            "name": "1. Akt Szene 1 Block 4",
+            "next_action": "DoNothing",
+            "path": "/load",
+            "post_wait": 0.0,
+            "pre_wait": 0.0,
+            "stylesheet": "font-size:10pt;",
             "timecode": {
                 "enabled": false,
                 "replace_hours": false,
@@ -206,48 +142,18 @@
             },
             "default_start_action": "Start",
             "default_stop_action": "Stop",
-            "description": "Mute Herbert,\nUnmute Lisa",
+            "description": "This is an example of a cue that just sets the light cue of the MagicQ console",
             "duration": 0.0,
             "fade_type": "Linear",
             "fadein_duration": 0.0,
             "fadein_type": "Linear",
             "fadeout_duration": 0.0,
             "fadeout_type": "Linear",
-            "id": "ad407605-67e6-4231-a8ca-cd5f43775951",
-            "index": 4,
-            "name": "Akt 2 Scene 2 Block 35",
+            "id": "9299ef7a-eefb-46c1-ae50-532e97e03a36",
+            "index": 2,
+            "name": "1. Akt Szene 1 Block 5",
             "next_action": "DoNothing",
-            "path": "",
-            "post_wait": 0.0,
-            "pre_wait": 0.0,
-            "stylesheet": "font-size:11pt;",
-            "timecode": {
-                "enabled": false,
-                "replace_hours": false,
-                "track": 0
-            },
-            "triggers": {}
-        },
-        {
-            "_type_": "MidiCue",
-            "controller": {
-                "keyboard": [],
-                "midi": [],
-                "osc": []
-            },
-            "default_start_action": "Start",
-            "default_stop_action": "Stop",
-            "description": "Light Effect: Nacht",
-            "duration": 0,
-            "fadein_duration": 0.0,
-            "fadein_type": "Linear",
-            "fadeout_duration": 0.0,
-            "fadeout_type": "Linear",
-            "id": "f42250af-7520-49fa-986a-b972dae1d50d",
-            "index": 5,
-            "message": "control_change channel=0 control=127 value=3",
-            "name": "-- Akt 1 Scene 1 Block 30 Light",
-            "next_action": "DoNothing",
+            "path": "/mq/pb/1/2",
             "post_wait": 0.0,
             "pre_wait": 0.0,
             "stylesheet": "font-size:10pt;",
