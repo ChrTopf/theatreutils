@@ -1,7 +1,8 @@
+import os
 import uuid
 
 STYLESHEET = "font-size:11pt;"
-
+MEDIA_SUBDIRECTORY = "audio"
 
 class LispCueFactory:
     """Creates the JSON dictionaries of the Linux Show Player (0.6.5) cue types used by the cue generator.
@@ -47,7 +48,7 @@ class LispCueFactory:
                         "buffer_size": -1,
                         "download": False,
                         "duration": 0,
-                        "uri": uri,
+                        "uri": f"{MEDIA_SUBDIRECTORY}{os.path.sep}{uri}",
                         "use_buffering": False,
                     },
                     "Volume": {"mute": False, "normal_volume": 1.0, "volume": 1.0},
