@@ -9,20 +9,27 @@ The following list of programs are used to prepare theater shows
    parses the output into an excel workbook.
 2. Cue generator: Reads the output of the previous application which has been slightly modified and generates all 
    necessary files for programming the decks and viewing the modified script.
-3. Script Viewer: Displays the script (JSON) exported by the cue generator in a user interface together with mute
-   annotations, audio and lighting commands. Next to every block, the generated LiSP cues, X32 snippets and light cues
-   are shown. This application is intended to be used during the live theater show to read through the text in parallel.
 
 The entire process for preparing a show can be observed in the following diagram:
 ![Preparing a show](documentation/theatreutils-activity.svg)
 
 ## Running a show
-TODO
+The following list of programs are used to run theater shows
 
-- backup plans
-- setup topology
-- sequence diagrams
-- OSC relay application
+1. Script Viewer: Displays the script (JSON) exported by the cue generator in a user interface together with mute
+   annotations, audio and lighting commands. Next to every block, the generated LiSP cues, X32 snippets and light cues
+   are shown. This application is intended to be used during the live theater show to read through the text in parallel.
+2. Lisp: The linux show player software is used to control the decks and play audio effects during the show.
+   Lisp is not part of this repository. You can find Lisp [here](https://www.linux-show-player.org/).
+3. OSC Relay: This is a command line application which receives the OSC commands from Lisp and routes them to the 
+   correct deck. All OSC commands that start with `/x32` are routed to the Behringer x32 deck and commands that start 
+   with `/mq` are routed to the Chamsys MagicQ deck.
+4. Buzzer: This small ardunio program is used to send serial commands upon the press of a physical button.
+5. Serial Keyboard: This is a command line application which receives the serial commands from the arduino and generates
+   key strokes according to an internal mapping. This application is used in conjunction with the buzzer sketch to 
+   press the space key on the host machine, which causes Lisp to jump to the next cue.
+
+## The applications
 
 ### OSC Relay
 `src/osc_relay.py` receives the OSC messages of LiSP over UDP, removes the first address segment and forwards the
