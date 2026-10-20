@@ -1,7 +1,8 @@
 const int BUTTON_PIN = 0;
 const int LED_PIN = 2;
 
-const char KEY_CHAR = '1';
+// Index of this button; serial_keyboard.py maps it to the key to press.
+const int KEY_INDEX = 1;
 
 const unsigned long DEBOUNCE_DELAY = 50;
 const unsigned long STARTUP_DELAY = 2000;
@@ -34,7 +35,7 @@ void loop() {
         digitalWrite(LED_PIN, HIGH);
 
         Serial.print("KEY:");
-        Serial.println(KEY_CHAR);
+        Serial.println(KEY_INDEX);
 
         digitalWrite(LED_PIN, LOW);
       }
