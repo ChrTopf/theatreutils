@@ -1,3 +1,5 @@
 pypdf
 openpyxl
 pyqt5
+pyserial
+pynput
