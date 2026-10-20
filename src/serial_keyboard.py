@@ -101,6 +101,11 @@ class KeyMapper:
         self.keyboard.release(key)
         print(f"Index {index}: pressed {key_name(key)}")
 
+    def request_input_permission(self) -> None:
+        """Presses escape once, so GNOME asks for the remote input permission now and not on the first button press."""
+        self.keyboard.press(Key.esc)
+        self.keyboard.release(Key.esc)
+
     def describe(self) -> str:
         return "\n".join(f"  {index} -> {key_name(key)}" for index, key in sorted(self.key_map.items()))
 
@@ -149,6 +154,7 @@ def main():
     port = arguments.port or choose_port()
     baud_rate = arguments.baud or choose_baud_rate()
     key_mapper = KeyMapper(DEFAULT_KEY_MAP | dict(arguments.key))
+    key_mapper.request_input_permission()
 
     print(f"Connecting to Arduino on {port} at {baud_rate} baud...")
     try:
