@@ -29,13 +29,16 @@ The following list of programs are used to run theater shows
    key strokes according to an internal mapping. This application is used in conjunction with the buzzer sketch to 
    press the space key on the host machine, which causes Lisp to jump to the next cue.
 
-## The applications
+## Application Documentation
+Please find the documentation of each application in this repository below.
 
-### OSC Relay
-`src/osc_relay.py` receives the OSC messages of LiSP over UDP, removes the first address segment and forwards the
-otherwise unchanged packet to the deck it names: `/x32/...` to `--x32 <host>:<port>` (the X32 listens on 10023),
-`/mq/...` to `--magicq <host>:<port>` (the OSC receive port set on the MagicQ). It listens on `--listen-host`
-(default 127.0.0.1) and `--listen-port` (default 9001, LiSP's default OSC destination).
+- [Script Parser](documentation/script-parser.md)
+- [Cue generator](documentation/cue-generator.md)
+- [Script Viewer](documentation/script-viewer.md)
+- [Linux Show Player](documentation/lisp.md)
+- [OSC Relay](documentation/osc-relay.md)
+- [Buzzer](documentation/buzzer.md)
+- [Serial Keyboard](documentation/serial-keyboard.md)
 
 ## File formats
 
