@@ -2,7 +2,8 @@
 
 When working with this codebase, prioritize readability over cleverness. 
 Ask clarifying questions before making architectural changes.
-Never ever execute any git commands!
+Never ever execute any commands! This is a major cybersecurity concern. 
+Every command which you execute is going to be rejected.
 
 ## About This Project
 

@@ -25,9 +25,9 @@ The following list of programs are used to run theater shows
    correct deck. All OSC commands that start with `/x32` are routed to the Behringer x32 deck and commands that start 
    with `/mq` are routed to the Chamsys MagicQ deck.
 4. Buzzer: This small ardunio program is used to send serial commands upon the press of a physical button.
-5. Serial Keyboard: This is a command line application which receives the serial commands from the arduino and generates
-   key strokes according to an internal mapping. This application is used in conjunction with the buzzer sketch to 
-   press the space key on the host machine, which causes Lisp to jump to the next cue.
+5. Serial Keyboard: This is a command line application which receives the serial commands from the arduino and executes
+   the shell command given on the command line. This application is used in conjunction with the
+   buzzer sketch to trigger actions on the host machine at the press of a physical button.
 
 ## Application Documentation
 Please find the documentation of each application in this repository below.
