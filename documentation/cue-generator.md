@@ -9,6 +9,7 @@ everything needed to program the decks and to follow the show:
 | Behringer X32 snippets (`.snp`), one per mic change | `--snp-output-dir` (always written) | X32 / X32-Edit |
 | Linux Show Player project (`.lsp`) | `--lisp-output` | [LiSP](lisp.md) |
 | List of light cues to program (`.csv`) | `--light-output` | Light designer / ChamSys MagicQ |
+| List of actors per part (`.csv`) | `--cast-output` | Stage management / sound engineer |
 | Script (`.json`) | `--script-output` | [Script Viewer](script-viewer.md) |
 
 ## Requirements
@@ -34,6 +35,7 @@ python3 src/cue_generator.py \
     --lisp-output out/Hugo.lsp --lisp-mutes --lisp-audio --lisp-light \
     --magicq-playback 1 \
     --light-output out/light-cues.csv \
+    --cast-output out/cast.csv \
     --script-output out/Hugo.json
 ```
 
@@ -53,6 +55,7 @@ created.
 | `--lisp-light` | no | off | Adds a cue jumping to the light effect's cue on the MagicQ for every light effect to the LiSP project. Requires `--lisp-output`. |
 | `--magicq-playback <n>` | no | `1` | The MagicQ playback (1-10) holding the light cues. Only the first 10 playbacks can be controlled via OSC. |
 | `--light-output <file>` | no | | The CSV file listing the light cues that must be programmed into the MagicQ. |
+| `--cast-output <file>` | no | | The CSV file listing the actors and the parts of the play they play in. |
 | `--script-output <file>` | no | | The script (`.json`) for the Script Viewer. |
 | `-h`, `--help` | no | | Prints the help and exits. |
 
@@ -120,6 +123,19 @@ columns:
 
 The cue numbers are assigned regardless of whether `--light-output` is given, so the LiSP project and the script always
 use the same numbers for the same workbook.
+
+### Cast list
+
+The CSV lists every actor of the Characters sheet in its order, with one column per part of the play (`Vorspann`,
+`1. Akt`, ...) in the order of the play:
+
+| Column | Description |
+| - | - |
+| `Mic` | The microphone channel of the actor |
+| `Actor` | The name of the actor |
+| `<part>` | `x` if one of the actor's characters has a block in the part, otherwise empty |
+
+An actor whose characters have no block in the play is listed with no part marked.
 
 ### Script
 
