@@ -73,6 +73,10 @@ longer names are cut to four characters:
 
 If a block triggers several cues of one deck, all of their names are listed.
 
+Below the document, a fixed strip shows the next cue of every visible lane under that lane, in the color its bar will
+have. It stays in place while scrolling, so the upcoming cues are always visible. If a block triggers several cues of
+one deck, the first one is shown; if no cue follows in a lane, `—` is shown. Hiding all lanes also hides the strip.
+
 ## Navigation
 
 | Input | Action |

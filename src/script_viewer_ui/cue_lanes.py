@@ -68,6 +68,10 @@ class CueLaneSegments:
     def of_lane(self, lane: CueLane) -> list[CueSegment]:
         return self._segments[LANES.index(lane)]
 
+    def next_segment(self, lane: CueLane, row: int) -> CueSegment | None:
+        """The segment of the next cue of the lane triggered after the row, or None if no cue follows."""
+        return next((segment for segment in self.of_lane(lane) if segment.first_row > row), None)
+
     def name_count(self, row: int, lanes: tuple[CueLane, ...]) -> int:
         """The most cue names any of the lanes starts at the row, which the row has to be tall enough for."""
         return max((len(self._names[LANES.index(lane)].get(row, [])) for lane in lanes), default=0)
