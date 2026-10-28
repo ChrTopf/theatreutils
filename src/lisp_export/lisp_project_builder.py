@@ -69,7 +69,8 @@ class LispProjectBuilder:
             block_cues = self._block_cues(next_cue_number, block)
             cues += block_cues
             cue_block_ids += [block.id] * len(block_cues)
-            next_cue_number += 1
+            if len(block_cues) > 0:
+                next_cue_number += 1
         for index, cue in enumerate(cues):
             cue["index"] = index
         return LispProject({"cues": cues, "meta": PROJECT_META, "session": PROJECT_SESSION}, cue_block_ids)
