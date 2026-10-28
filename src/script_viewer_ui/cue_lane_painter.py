@@ -14,6 +14,7 @@ RowSpan = Callable[[int], tuple[int, int]]
 def cue_name_font() -> QFont:
     font = QFont()
     font.setPointSize(theme.LANE_POINT_SIZE)
+    font.setBold(True)
     return font
 
 

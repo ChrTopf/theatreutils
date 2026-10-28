@@ -11,7 +11,7 @@ FONT_POINT_SIZE = 14
 CHARACTER_POINT_SIZE = 12
 CUE_POINT_SIZE = 12
 STATUS_POINT_SIZE = 11
-LANE_POINT_SIZE = 11
+LANE_POINT_SIZE = 18
 LANE_LABEL_POINT_SIZE = 10
 
 # Geometry of a block card, in pixels.
@@ -25,8 +25,10 @@ CUE_COLUMN_WIDTH = 230
 COLUMN_GAP = 24
 
 # Geometry of the cue lanes running down the page right of the block cards, in pixels.
-LANE_WIDTH = 190
+LANE_WIDTH = 120
 LANE_GAP = 8
+# Cue names are a letter and a three digit number (L001, S001, Q001), longer names are cut.
+CUE_NAME_LENGTH = 4
 LANE_LABEL_MARGIN = 8
 LANE_LABEL_PADDING = 8
 CUE_BAR_WIDTH = 4

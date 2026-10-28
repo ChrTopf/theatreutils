@@ -42,9 +42,9 @@ class CueSegment:
 class CueLaneSegments:
     """The cue segments of every lane, in the order of LANES.
 
-    - LiSP cues: the index in the LiSP cue list and the name of the cue.
-    - X32 snippets: the snippet number on the console and its name.
-    - Light cues: the MagicQ cue number and the name of the light effect.
+    Every cue is labeled by its compact name, a letter and a three digit number:
+    L for LiSP cues, S for X32 snippets and Q for light cues. Labels are cut
+    to theme.CUE_NAME_LENGTH characters, since nothing more is needed.
 
     Every new segment of a lane gets the next color of theme.CUE_COLORS, so
     neighbouring cues can always be told apart.
@@ -56,12 +56,12 @@ class CueLaneSegments:
         self._names: tuple[dict[int, list[str]], ...] = tuple({} for _ in LANES)
 
         for cue in script.lisp_cues:
-            self._add(cue.block_id, LISP_LANE, f"{cue.index}  {cue.name}")
+            self._add(cue.block_id, LISP_LANE, cue.name)
         for snippet in script.x32_snippets:
-            self._add(snippet.block_id, X32_LANE, f"#{snippet.number}  {snippet.name}")
+            self._add(snippet.block_id, X32_LANE, snippet.name)
         for cue in script.light_cues:
             for block_id in cue.block_ids:
-                self._add(block_id, LIGHT_CUE_LANE, f"Q{cue.cue}  {cue.name}")
+                self._add(block_id, LIGHT_CUE_LANE, cue.name)
 
         self._segments = tuple(self._build_segments(names_by_row) for names_by_row in self._names)
 
@@ -75,7 +75,7 @@ class CueLaneSegments:
     def _add(self, block_id: int, lane: CueLane, name: str) -> None:
         row = self._rows_of_blocks.get(block_id)
         if row is not None:
-            self._names[LANES.index(lane)].setdefault(row, []).append(name)
+            self._names[LANES.index(lane)].setdefault(row, []).append(name[:theme.CUE_NAME_LENGTH])
 
     def _build_segments(self, names_by_row: dict[int, list[str]]) -> list[CueSegment]:
         first_rows = sorted(names_by_row)

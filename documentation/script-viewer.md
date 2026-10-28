@@ -62,13 +62,14 @@ blocks are dimmed.
 
 Right of the cards, one lane per deck shows which cue is active. A colored bar starts at the block triggering a cue and
 runs down to the block triggering the next cue of that deck. Neighbouring cues have different colors. The name of the
-cue is written beside the start of its bar:
+cue is written in large bold letters beside the start of its bar. It consists of a letter and a three digit number,
+longer names are cut to four characters:
 
 | Lane | Label |
 | - | - |
-| LiSP Cues | `<index>  <name>`: the index in the LiSP cue list and the cue name |
-| X32 Snippets | The snippet number (= number of the `.snp` file) and its name |
-| Light Cues | The MagicQ cue number and the name of the light effect |
+| LiSP Cues | `L<number>`, e.g. `L001` |
+| X32 Snippets | `S<number>`, e.g. `S001` |
+| Light Cues | `Q<number>`, e.g. `Q001` |
 
 If a block triggers several cues of one deck, all of their names are listed.
 
