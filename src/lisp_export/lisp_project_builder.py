@@ -9,6 +9,8 @@ AUDIO_EXTENSION = ".wav"
 # OSC command of the X32 that recalls the snippet in the given slot of the show.
 X32_LOAD_PATH = "/load"
 
+CUE_START_INDEX = 0
+
 # Everything around the cue list is taken over from a project saved by LiSP 0.6.5.
 PROJECT_META = {
     "plugins": {plugin: "0.6.5" for plugin in (
@@ -60,18 +62,20 @@ class LispProjectBuilder:
         self.include_light = include_light
 
     def build(self, blocks: list[Block]) -> LispProject:
+        next_cue_number = CUE_START_INDEX
         cues = []
         cue_block_ids = []
         for block in blocks:
-            block_cues = self._block_cues(block)
+            block_cues = self._block_cues(next_cue_number, block)
             cues += block_cues
             cue_block_ids += [block.id] * len(block_cues)
+            next_cue_number += 1
         for index, cue in enumerate(cues):
             cue["index"] = index
         return LispProject({"cues": cues, "meta": PROJECT_META, "session": PROJECT_SESSION}, cue_block_ids)
 
-    def _block_cues(self, block: Block) -> list[dict]:
-        block_name = f"{block.part} Scene {block.scene} Block {block.id}"
+    def _block_cues(self, number: int, block: Block) -> list[dict]:
+        block_name = f"L{number}"
         cues = []
         if self.include_mutes and block.id in self.snippet_numbers:
             cues.append(self._mute_cue(block))
@@ -80,8 +84,8 @@ class LispProjectBuilder:
         if self.include_light and block.light:
             cues.append(self._light_cue(block))
 
-        for cue in cues:
-            cue["name"] = block_name
+        for i, cue in enumerate(cues):
+            cue["name"] = block_name if i == 0 else f'└{block_name}'
         for cue in cues[:-1]:
             cue["next_action"] = "TriggerAfterWait"
         return cues
