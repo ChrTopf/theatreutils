@@ -3,8 +3,8 @@ from PyQt5.QtGui import QFontMetrics, QPainter, QPaintEvent
 from PyQt5.QtWidgets import QWidget
 
 from script_viewer_ui import theme
-from script_viewer_ui.cue_lane_painter import cue_name_font
 from script_viewer_ui.cue_lanes import LANES, CueLane, CueLaneSegments
+from script_viewer_ui.cue_style import CueStyle
 from script_viewer_ui.row_layout import RowLayout
 
 # Shown in place of a cue name if no further cue follows in the lane.
@@ -12,20 +12,12 @@ NO_NEXT_CUE = "—"
 
 
 class CueLaneFooter(QWidget):
-    """The strip below the document showing the next cue of every visible lane, each one under its lane.
-
-    It lies outside of the scrolled area, so the next cues are always visible.
-    Its width has to match the viewport of the document, so the RowLayout puts
-    the names under the same lanes as the rows above. The next cue is drawn in
-    the color its bar will have, if a block triggers several cues of a lane at
-    once, the first one is shown. Right of the name, a counter in the same
-    large font shows how many blocks lie ahead until the cue is triggered.
-    """
+    """The strip below the document showing the next cue of every visible lane, each one under its lane."""
 
     def __init__(self, cue_lanes: CueLaneSegments, parent=None):
         super().__init__(parent)
         self._cue_lanes = cue_lanes
-        self._font = cue_name_font()
+        self._font = CueStyle.cue_name_font()
         self._label_height = QFontMetrics(self._font).height() + theme.LANE_LABEL_PADDING
         self.setFixedHeight(self._label_height + 2 * theme.LANE_LABEL_MARGIN)
         self._visible_lanes = LANES

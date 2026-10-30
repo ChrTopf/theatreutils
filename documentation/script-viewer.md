@@ -73,6 +73,9 @@ longer names are cut to four characters:
 
 If a block triggers several cues of one deck, all of their names are listed.
 
+Below the name, a second line in slightly smaller letters tells where the triggering block is:
+`<first letter of part>S<scene> B<block>`, e.g. `AS3 B142` for block 142 in scene 3 of a part starting with `A`.
+
 Below the document, a fixed strip shows the next cue of every visible lane under that lane, in the color its bar will
 have. It stays in place while scrolling, so the upcoming cues are always visible. If a block triggers several cues of
 one deck, the first one is shown; if no cue follows in a lane, `—` is shown. Right of each name, a counter in the same large

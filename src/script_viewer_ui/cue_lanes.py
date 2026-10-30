@@ -14,6 +14,7 @@ class CueLaneSegments:
     """The cue segments of every lane, in the order of LANES."""
 
     def __init__(self, script: Script):
+        self._blocks = script.blocks
         self._row_count = len(script.blocks)
         self._rows_of_blocks = {block.id: row for row, block in enumerate(script.blocks)}
         self._names: tuple[dict[int, list[str]], ...] = tuple({} for _ in LANES)
@@ -49,5 +50,10 @@ class CueLaneSegments:
             is_last = number + 1 == len(first_rows)
             last_row = self._row_count - 1 if is_last else first_rows[number + 1] - 1
             color = theme.CUE_COLORS[number % len(theme.CUE_COLORS)]
-            segments.append(CueSegment(first_row, last_row, tuple(names_by_row[first_row]), color))
+            segments.append(CueSegment(first_row, last_row, tuple(names_by_row[first_row]),
+                                       self._location(first_row), color))
         return segments
+
+    def _location(self, row: int) -> str:
+        block = self._blocks[row]
+        return f"{block.part} S{block.scene} B{block.id}"

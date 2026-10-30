@@ -9,8 +9,8 @@ from PyQt5.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
 from model.block import Block
 from script_viewer_ui import theme
 from script_viewer_ui.block_list_model import BLOCK_ROLE, IS_CURRENT_ROLE
-from script_viewer_ui.cue_lane_painter import cue_name_font
 from script_viewer_ui.cue_lanes import LANES, CueLane, CueLaneSegments
+from script_viewer_ui.cue_style import CueStyle
 from script_viewer_ui.row_layout import RowLayout
 
 UNMUTE_PREFIX = "▲ "
@@ -117,8 +117,8 @@ class BlockDelegate(QStyledItemDelegate):
         columns = self._columns(card_width)
         text_height = self._text_document(block, columns.text, is_current=False).size().height()
         cue_height = len(self._cue_lines(block, is_current=False)) * QFontMetrics(self._cue_font()).lineSpacing()
-        cue_name_height = cue_name_count * QFontMetrics(cue_name_font()).lineSpacing()
-        return math.ceil(max(text_height, cue_height, cue_name_height)) + 2 * theme.BLOCK_PADDING
+        label_height = CueStyle.cue_label_height(cue_name_count)
+        return math.ceil(max(text_height, cue_height, label_height)) + 2 * theme.BLOCK_PADDING
 
     def _row_layout(self, row: QRect) -> RowLayout:
         return RowLayout(row.x(), row.width() or self._viewport_width, self._visible_lanes)
