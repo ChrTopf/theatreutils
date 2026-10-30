@@ -6,7 +6,7 @@ from model.light_cue_entry import LightCueEntry
 from model.lisp_cue_entry import LispCueEntry
 from model.snippet_entry import SnippetEntry
 
-FORMAT_VERSION = 1
+FORMAT_VERSION = 3
 
 
 @dataclass

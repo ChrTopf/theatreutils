@@ -3,17 +3,18 @@ import os
 
 from model.block import Block
 
-HEADERS = ("Cue", "Effect", "Blocks")
+HEADERS = ("Cue", "Name", "Effect", "Blocks")
 
 
 class LightCueListWriter:
     """Writes the list of light cues that must be programmed into the MagicQ as a CSV file.
 
-    Every row names the cue number, the effect and the IDs of the blocks
-    triggering it, so the light designer knows where in the play it is used.
+    Every row names the cue number, the cue name, the effect and the IDs of the
+    blocks triggering it, so the light designer knows where in the play it is used.
     """
 
-    def write(self, cue_numbers: dict[str, int], blocks: list[Block], output_path: str) -> None:
+    def write(self, cue_numbers: dict[str, int], cue_names: dict[str, str], blocks: list[Block],
+              output_path: str) -> None:
         block_ids: dict[str, list[str]] = {effect: [] for effect in cue_numbers}
         for block in blocks:
             if block.light in block_ids:
@@ -26,4 +27,4 @@ class LightCueListWriter:
             writer = csv.writer(csv_file)
             writer.writerow(HEADERS)
             for effect, cue_number in sorted(cue_numbers.items(), key=lambda item: item[1]):
-                writer.writerow((cue_number, effect, ", ".join(block_ids[effect])))
+                writer.writerow((cue_number, cue_names[effect], effect, ", ".join(block_ids[effect])))

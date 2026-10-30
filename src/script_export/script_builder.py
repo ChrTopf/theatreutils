@@ -17,20 +17,22 @@ class ScriptBuilder:
     """
 
     def build(self, blocks: list[Block], snippets: list[X32Snippet], snippet_numbers: dict[int, int],
-              light_cue_numbers: dict[str, int], lisp_project: Optional[LispProject]) -> Script:
+              light_cue_numbers: dict[str, int], light_cue_names: dict[str, str],
+              lisp_project: Optional[LispProject]) -> Script:
         return Script(
             blocks=blocks,
             lisp_cues=self._lisp_cues(lisp_project),
             x32_snippets=self._snippets(snippets, snippet_numbers),
-            light_cues=self._light_cues(blocks, light_cue_numbers),
+            light_cues=self._light_cues(blocks, light_cue_numbers, light_cue_names),
         )
 
     @staticmethod
     def _lisp_cues(lisp_project: Optional[LispProject]) -> list[LispCueEntry]:
         if lisp_project is None:
             return []
-        return [LispCueEntry(index=cue["index"], name=cue["name"], description=cue["description"], block_id=block_id)
-                for cue, block_id in zip(lisp_project.cues, lisp_project.cue_block_ids)]
+        return [LispCueEntry(index=cue["index"], name=cue["name"], description=cue["description"], color=color,
+                             block_id=block_id)
+                for cue, block_id, color in zip(lisp_project.cues, lisp_project.cue_block_ids, lisp_project.cue_colors)]
 
     @staticmethod
     def _snippets(snippets: list[X32Snippet], snippet_numbers: dict[int, int]) -> list[SnippetEntry]:
@@ -39,8 +41,10 @@ class ScriptBuilder:
                 for (block_id, number), snippet in zip(snippet_numbers.items(), snippets)]
 
     @staticmethod
-    def _light_cues(blocks: list[Block], light_cue_numbers: dict[str, int]) -> list[LightCueEntry]:
-        cues = {effect: LightCueEntry(cue=number, name=effect) for effect, number in light_cue_numbers.items()}
+    def _light_cues(blocks: list[Block], light_cue_numbers: dict[str, int],
+                    light_cue_names: dict[str, str]) -> list[LightCueEntry]:
+        cues = {effect: LightCueEntry(cue=number, name=light_cue_names[effect], effect=effect)
+                for effect, number in light_cue_numbers.items()}
         for block in blocks:
             if block.light in cues:
                 cues[block.light].block_ids.append(block.id)

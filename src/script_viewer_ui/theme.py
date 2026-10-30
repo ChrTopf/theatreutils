@@ -11,21 +11,23 @@ FONT_POINT_SIZE = 14
 CHARACTER_POINT_SIZE = 12
 CUE_POINT_SIZE = 12
 STATUS_POINT_SIZE = 11
-LANE_POINT_SIZE = 11
+LANE_POINT_SIZE = 18
+CUE_LOCATION_POINT_SIZE = 14
 LANE_LABEL_POINT_SIZE = 10
 
 # Geometry of a block card, in pixels.
-MAX_CONTENT_WIDTH = 1200
+MAX_CONTENT_WIDTH = 950
 PAGE_MARGIN = 24
 BLOCK_SPACING = 6
 BLOCK_PADDING = 14
 CURRENT_BORDER_WIDTH = 2
 BLOCK_CORNER_RADIUS = 6
-CUE_COLUMN_WIDTH = 230
+# The gap between the block cards and the cue lanes.
 COLUMN_GAP = 24
 
 # Geometry of the cue lanes running down the page right of the block cards, in pixels.
-LANE_WIDTH = 190
+# Wide enough for the cue names below the labels, e.g. "1. Akt S12 B415".
+LANE_WIDTH = 300
 LANE_GAP = 8
 LANE_LABEL_MARGIN = 8
 LANE_LABEL_PADDING = 8
@@ -51,33 +53,13 @@ DIMMED_COMMAND_TEXT = QColor("#7a5536")
 DIRECTION_TEXT = QColor("#c9c9d2")
 DIMMED_DIRECTION_TEXT = QColor("#55555d")
 
-MUTE = QColor("#ff5c5c")
-DIMMED_MUTE = QColor("#7e3a3a")
-UNMUTE = QColor("#5cdc7a")
-DIMMED_UNMUTE = QColor("#36704a")
-
-AUDIO_EFFECT = QColor("#5cc8ff")
-DIMMED_AUDIO_EFFECT = QColor("#356079")
-LIGHT = QColor("#ffe066")
-DIMMED_LIGHT = QColor("#7d7039")
-
-# The cue lanes: the color of the lane name in the header.
+# The cue lanes: the color of the lane name in the header. The X32 and light cues are drawn in their lane's color,
+# the LiSP cues in the colors they have in LiSP.
 LISP_LANE = QColor("#c39bff")
 X32_LANE = QColor("#4fd8c4")
 LIGHT_CUE_LANE = QColor("#ffb84d")
 LANE_LABEL_BACKGROUND = QColor(13, 13, 15, 235)
 
-# The cues within a lane take turns with these colors, so neighbouring cues differ.
-CUE_COLORS = (
-    QColor("#ff6b6b"),
-    QColor("#4dabf7"),
-    QColor("#ffd43b"),
-    QColor("#69db7c"),
-    QColor("#da77f2"),
-    QColor("#ff922b"),
-    QColor("#3bc9db"),
-    QColor("#f783ac"),
-)
 # Cues that are not active at the current block are darkened by this factor, see QColor.darker().
 DIMMED_CUE_FACTOR = 220
 

@@ -1,88 +1,89 @@
-from dataclasses import dataclass
-
 from PyQt5.QtGui import QColor
 
+from model.block import Block
 from model.script import Script
 from script_viewer_ui import theme
+from script_viewer_ui.cue_lane import CueLane
+from script_viewer_ui.cue_segment import CueSegment
 
-
-@dataclass(frozen=True, eq=False)
-class CueLane:
-    """A column running down the page next to the block cards, showing the cues of one deck."""
-
-    name: str
-    color: QColor
-
-
-LISP_LANE = CueLane("LiSP Cues", theme.LISP_LANE)
-X32_LANE = CueLane("X32 Snippets", theme.X32_LANE)
-LIGHT_CUE_LANE = CueLane("Light Cues", theme.LIGHT_CUE_LANE)
+LISP_LANE = CueLane("LiSP Cues", "L", theme.LISP_LANE)
+X32_LANE = CueLane("X32 Snippets", "S", theme.X32_LANE)
+LIGHT_CUE_LANE = CueLane("Light Cues", "Q", theme.LIGHT_CUE_LANE)
 
 # The lanes from left to right.
 LANES = (LISP_LANE, X32_LANE, LIGHT_CUE_LANE)
 
+# Separates the names of several cues of one deck triggered by the same block.
+CUE_NAME_SEPARATOR = ", "
 
-@dataclass(frozen=True)
-class CueSegment:
-    """The rows a cue stays active for: from the block triggering it up to the block triggering the next cue.
+# The segments of a lane are numbered from this number on.
+FIRST_SEGMENT_NUMBER = 1
 
-    If a block triggers several cues of the same deck at once, they share one
-    segment and all of their names are listed.
-    """
-
-    first_row: int
-    last_row: int
-    names: tuple[str, ...]
-    color: QColor
-
-    def contains(self, row: int) -> bool:
-        return self.first_row <= row <= self.last_row
-
+UNMUTE_PREFIX = "▲ "
+MUTE_PREFIX = "▼ "
+AUDIO_PREFIX = "♪ "
+LIGHT_PREFIX = "☀ "
 
 class CueLaneSegments:
-    """The cue segments of every lane, in the order of LANES.
-
-    - LiSP cues: the index in the LiSP cue list and the name of the cue.
-    - X32 snippets: the snippet number on the console and its name.
-    - Light cues: the MagicQ cue number and the name of the light effect.
-
-    Every new segment of a lane gets the next color of theme.CUE_COLORS, so
-    neighbouring cues can always be told apart.
-    """
+    """The cue segments of every lane, in the order of LANES."""
 
     def __init__(self, script: Script):
+        self._blocks = script.blocks
         self._row_count = len(script.blocks)
         self._rows_of_blocks = {block.id: row for row, block in enumerate(script.blocks)}
         self._names: tuple[dict[int, list[str]], ...] = tuple({} for _ in LANES)
+        self._colors: tuple[dict[int, QColor], ...] = tuple({} for _ in LANES)
 
         for cue in script.lisp_cues:
-            self._add(cue.block_id, LISP_LANE, f"{cue.index}  {cue.name}")
+            self._add(cue.block_id, LISP_LANE, cue.name, QColor(cue.color))
         for snippet in script.x32_snippets:
-            self._add(snippet.block_id, X32_LANE, f"#{snippet.number}  {snippet.name}")
+            self._add(snippet.block_id, X32_LANE, snippet.name, X32_LANE.color)
         for cue in script.light_cues:
             for block_id in cue.block_ids:
-                self._add(block_id, LIGHT_CUE_LANE, f"Q{cue.cue}  {cue.name}")
+                self._add(block_id, LIGHT_CUE_LANE, cue.name, LIGHT_CUE_LANE.color)
 
-        self._segments = tuple(self._build_segments(names_by_row) for names_by_row in self._names)
+        self._segments = tuple(self._build_segments(lane) for lane in LANES)
+        self._segments_by_first_row = tuple({segment.first_row: segment for segment in segments}
+                                            for segments in self._segments)
 
     def of_lane(self, lane: CueLane) -> list[CueSegment]:
         return self._segments[LANES.index(lane)]
 
-    def name_count(self, row: int, lanes: tuple[CueLane, ...]) -> int:
-        """The most cue names any of the lanes starts at the row, which the row has to be tall enough for."""
-        return max((len(self._names[LANES.index(lane)].get(row, [])) for lane in lanes), default=0)
+    def next_segment(self, lane: CueLane, row: int) -> CueSegment | None:
+        return next((segment for segment in self.of_lane(lane) if segment.first_row > row), None)
 
-    def _add(self, block_id: int, lane: CueLane, name: str) -> None:
+    def starting_at(self, row: int, lanes: tuple[CueLane, ...]) -> list[CueSegment]:
+        segments = (self._segments_by_first_row[LANES.index(lane)].get(row) for lane in lanes)
+        return [segment for segment in segments if segment is not None]
+
+    def _add(self, block_id: int, lane: CueLane, name: str, color: QColor) -> None:
         row = self._rows_of_blocks.get(block_id)
         if row is not None:
             self._names[LANES.index(lane)].setdefault(row, []).append(name)
+            self._colors[LANES.index(lane)].setdefault(row, color)
 
-    def _build_segments(self, names_by_row: dict[int, list[str]]) -> list[CueSegment]:
+    def _build_segments(self, lane: CueLane) -> list[CueSegment]:
+        names_by_row = self._names[LANES.index(lane)]
+        colors_by_row = self._colors[LANES.index(lane)]
         first_rows = sorted(names_by_row)
         segments = []
-        for number, first_row in enumerate(first_rows):
-            is_last = number + 1 == len(first_rows)
-            last_row = self._row_count - 1 if is_last else first_rows[number + 1] - 1
-            color = theme.CUE_COLORS[number % len(theme.CUE_COLORS)]
-            segments.append(CueSegment(first_row, last_row, tuple(names_by_row[first_row]), color))
+        for index, first_row in enumerate(first_rows):
+            is_last = index + 1 == len(first_rows)
+            last_row = self._row_count - 1 if is_last else first_rows[index + 1] - 1
+            label = f"{lane.prefix}{index + FIRST_SEGMENT_NUMBER}"
+            name = CUE_NAME_SEPARATOR.join(dict.fromkeys(names_by_row[first_row]))
+            details = self._details(lane, self._blocks[first_row])
+            segments.append(CueSegment(first_row, last_row, label, name, colors_by_row[first_row], details))
         return segments
+
+    @staticmethod
+    def _details(lane: CueLane, block: Block) -> tuple[str, ...]:
+        if lane is LISP_LANE and block.audio_effect:
+            return (AUDIO_PREFIX + block.audio_effect,)
+        if lane is X32_LANE:
+            unmutes = [UNMUTE_PREFIX + actor for actor in block.unmute]
+            mutes = [MUTE_PREFIX + actor for actor in block.mute]
+            return tuple(unmutes + mutes)
+        if lane is LIGHT_CUE_LANE and block.light:
+            return (LIGHT_PREFIX + block.light,)
+        return ()

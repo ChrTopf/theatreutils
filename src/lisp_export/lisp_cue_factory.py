@@ -1,7 +1,7 @@
 import os
 import uuid
 
-STYLESHEET = "font-size:11pt;"
+FONT_STYLESHEET = "font-size:11pt;"
 MEDIA_SUBDIRECTORY = "audio"
 
 class LispCueFactory:
@@ -62,6 +62,11 @@ class LispCueFactory:
         return cue
 
     @staticmethod
+    def set_color(cue: dict, color: str) -> None:
+        """Sets the background color the cue is shown with in the LiSP cue list, e.g. `#3584e4`."""
+        cue["stylesheet"] = f"background:{color};{FONT_STYLESHEET}"
+
+    @staticmethod
     def _base_cue(cue_type: str, name: str, description: str) -> dict:
         return {
             "_type_": cue_type,
@@ -79,7 +84,7 @@ class LispCueFactory:
             "next_action": "DoNothing",
             "post_wait": 0.0,
             "pre_wait": 0.0,
-            "stylesheet": STYLESHEET,
+            "stylesheet": FONT_STYLESHEET,
             "timecode": {"enabled": False, "replace_hours": False, "track": 0},
             "triggers": {},
         }

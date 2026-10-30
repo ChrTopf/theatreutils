@@ -2,7 +2,7 @@ import os
 
 from snippet_export.x32_snippet import X32Snippet
 
-FIRST_SNIPPET_NUMBER = 1
+FIRST_SNIPPET_NUMBER = 0
 
 
 class SnippetWriter:

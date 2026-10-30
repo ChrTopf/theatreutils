@@ -91,24 +91,27 @@ triggering it by the block ID.
 
 ```json
 {
-    "version": 1,
+    "version": 3,
     "blocks": [
         {"id": 7, "type": "dialogue", "part": "1. Akt", "scene": 1, "page": 2, "text": "...", "character": "Hugo",
          "direction": null, "mute": ["Ben"], "unmute": ["Anna"], "audio_effect": null, "light": "Spot Hugo"}
     ],
-    "lisp_cues": [{"index": 4, "name": "1. Akt Scene 1 Block 7", "description": "Executes multiple actions at once", "block_id": 7}],
-    "x32_snippets": [{"number": 2, "name": "A1S1 B7", "block_id": 7}],
-    "light_cues": [{"cue": 2, "name": "Spot Hugo", "block_ids": [7, 19, 31]}]
+    "lisp_cues": [{"index": 4, "name": "1. Akt S1 B7", "description": "Executes multiple actions at once", "color": "#3584e4", "block_id": 7}],
+    "x32_snippets": [{"number": 2, "name": "1. Akt S1 B7", "block_id": 7}],
+    "light_cues": [{"cue": 2, "name": "1. Akt S1 B7", "effect": "Spot Hugo", "block_ids": [7, 19, 31]}]
 }
 ```
 
+Every cue is named after the block triggering it: `<part> S<scene> B<block id>`. A light cue reused by several blocks is
+named after the first of them.
+
 | Key | Description |
 | - | - |
-| `version` | The version of the format, currently `1` |
+| `version` | The version of the format, currently `3` |
 | `blocks` | The blocks of the Blocks sheet with the same fields as its columns |
-| `lisp_cues` | Every cue of the `.lsp` project: its `index` in the LiSP cue list, `name`, `description` and `block_id`. Empty if no `--lisp-output` is given |
+| `lisp_cues` | Every cue of the `.lsp` project: its `index` in the LiSP cue list, `name`, `description`, background `color` and `block_id`. Empty if no `--lisp-output` is given |
 | `x32_snippets` | Every generated snippet: its `number` on the X32 (= number of the `.snp` file), `name` and `block_id` |
-| `light_cues` | Every light cue: its MagicQ `cue` number, the light effect `name` and the `block_ids` triggering it |
+| `light_cues` | Every light cue: its MagicQ `cue` number, `name`, the light `effect` and the `block_ids` triggering it |
 
 ### Behringer X32 Scenes
 Every time a block contains an actor to be muted / unmuted, another `.snp` file must be generated. The generated files
@@ -137,5 +140,5 @@ address segment of every OSC cue names the target deck (`/x32/...` or `/mq/...`)
   (see https://docs.chamsys.co.uk/magicq/1.9.9.x/manual/OSC.html). The playback is set by `--magicq-playback`
   (1-10, default 1, only the first 10 playbacks are controllable via OSC).
   Every light effect name gets one MagicQ cue number (numbered from 1 in order of first appearance, reused if the
-  effect occurs again). The list of cues to program into the desk is written as CSV (`Cue`, `Effect`, `Blocks`) to
+  effect occurs again). The list of cues to program into the desk is written as CSV (`Cue`, `Name`, `Effect`, `Blocks`) to
   the file given by `--light-output`.

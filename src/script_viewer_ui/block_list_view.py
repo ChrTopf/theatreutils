@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QAbstractItemView, QListView
 from script_viewer_ui import theme
 from script_viewer_ui.block_delegate import BlockDelegate
 from script_viewer_ui.block_list_model import BlockListModel
+from script_viewer_ui.cue_lane_footer import CueLaneFooter
 from script_viewer_ui.cue_lane_header import CueLaneHeader
 from script_viewer_ui.cue_lane_painter import CueLanePainter
 from script_viewer_ui.cue_lanes import LANES, CueLane
@@ -24,8 +25,9 @@ class BlockListView(QListView):
 
     The cue lanes right of the cards span many rows, so they are painted over
     the whole viewport after the rows. Their names sit in a header above the
-    viewport, so they never cover the cue bars. Hidden lanes make room for
-    wider cards; if all lanes are hidden, so is the header.
+    viewport, so they never cover the cue bars, and the next cue of every lane
+    sits in a footer below it, so it is always visible. Hidden lanes make room
+    for wider cards; if all lanes are hidden, so are the header and the footer.
     """
 
     current_row_changed = pyqtSignal(int)
@@ -49,7 +51,9 @@ class BlockListView(QListView):
         self.setStyleSheet(_STYLE_SHEET)
 
         self._header = CueLaneHeader(self)
-        self._update_header_margin()
+        self._footer = CueLaneFooter(model.cue_lanes, self)
+        self._footer.set_current_row(model.current_row)
+        self._update_lane_margins()
 
         # Wrapped text changes its height whenever the width changes, so all cards have
         # to be re-measured - but only once the resizing has settled down.
@@ -71,13 +75,15 @@ class BlockListView(QListView):
         self._center_current_row()
         # The highlighted cues span far more rows than the two the model reports as changed.
         self.viewport().update()
+        self._footer.set_current_row(row)
         self.current_row_changed.emit(row)
 
     def set_visible_lanes(self, lanes: tuple[CueLane, ...]) -> None:
         self._visible_lanes = lanes
         self._delegate.set_visible_lanes(lanes)
         self._header.set_visible_lanes(lanes)
-        self._update_header_margin()
+        self._footer.set_visible_lanes(lanes)
+        self._update_lane_margins()
         # The cards change their width and with it the height of their wrapped text.
         self.scheduleDelayedItemsLayout()
         self._center_current_row()
@@ -114,7 +120,7 @@ class BlockListView(QListView):
 
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
-        self._place_header()
+        self._place_lane_bars()
         self._relayout_timer.start()
         self._center_current_row()
 
@@ -131,14 +137,20 @@ class BlockListView(QListView):
         super().scrollContentsBy(dx, dy)
         self.viewport().update()
 
-    def _update_header_margin(self) -> None:
-        self._header.setVisible(bool(self._visible_lanes))
-        self.setViewportMargins(0, self._header.height() if self._visible_lanes else 0, 0, 0)
-        self._place_header()
+    def _update_lane_margins(self) -> None:
+        has_lanes = bool(self._visible_lanes)
+        self._header.setVisible(has_lanes)
+        self._footer.setVisible(has_lanes)
+        if has_lanes:
+            self.setViewportMargins(0, self._header.height(), 0, self._footer.height())
+        else:
+            self.setViewportMargins(0, 0, 0, 0)
+        self._place_lane_bars()
 
-    def _place_header(self) -> None:
+    def _place_lane_bars(self) -> None:
         viewport = self.viewport().geometry()
         self._header.setGeometry(viewport.x(), viewport.y() - self._header.height(), viewport.width(), self._header.height())
+        self._footer.setGeometry(viewport.x(), viewport.y() + viewport.height(), viewport.width(), self._footer.height())
 
     def _row_span(self, row: int) -> tuple[int, int]:
         rect = self.visualRect(self._block_model.index(row))
