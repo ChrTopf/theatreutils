@@ -75,7 +75,9 @@ If a block triggers several cues of one deck, all of their names are listed.
 
 Below the document, a fixed strip shows the next cue of every visible lane under that lane, in the color its bar will
 have. It stays in place while scrolling, so the upcoming cues are always visible. If a block triggers several cues of
-one deck, the first one is shown; if no cue follows in a lane, `—` is shown. Hiding all lanes also hides the strip.
+one deck, the first one is shown; if no cue follows in a lane, `—` is shown. Right of each name, a counter in the same large
+letters shows how many blocks lie ahead until that cue is triggered; `1` means the next block triggers it. Hiding all lanes
+also hides the strip.
 
 ## Navigation
 

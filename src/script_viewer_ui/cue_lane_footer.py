@@ -12,13 +12,14 @@ NO_NEXT_CUE = "—"
 
 
 class CueLaneFooter(QWidget):
-    """The strip below the document showing the next cue of every visible lane, each one centered under its lane.
+    """The strip below the document showing the next cue of every visible lane, each one under its lane.
 
     It lies outside of the scrolled area, so the next cues are always visible.
     Its width has to match the viewport of the document, so the RowLayout puts
     the names under the same lanes as the rows above. The next cue is drawn in
     the color its bar will have, if a block triggers several cues of a lane at
-    once, the first one is shown.
+    once, the first one is shown. Right of the name, a counter in the same
+    large font shows how many blocks lie ahead until the cue is triggered.
     """
 
     def __init__(self, cue_lanes: CueLaneSegments, parent=None):
@@ -57,4 +58,16 @@ class CueLaneFooter(QWidget):
             painter.setBrush(theme.LANE_LABEL_BACKGROUND)
             painter.drawRoundedRect(QRectF(label).adjusted(0.5, 0.5, -0.5, -0.5), radius, radius)
             text = QRect(label).adjusted(theme.LANE_LABEL_PADDING, 0, -theme.LANE_LABEL_PADDING, 0)
-            painter.drawText(text, Qt.AlignCenter, metrics.elidedText(name, Qt.ElideRight, text.width()))
+
+            if segment is None:
+                painter.drawText(text, Qt.AlignCenter, name)
+                continue
+
+            counter = str(segment.first_row - self._current_row)
+            counter_width = metrics.horizontalAdvance(counter)
+            painter.setPen(theme.MUTED_LABEL)
+            painter.drawText(text, Qt.AlignRight | Qt.AlignVCenter, counter)
+
+            name_rect = text.adjusted(0, 0, -(counter_width + theme.LANE_LABEL_PADDING), 0)
+            painter.setPen(color)
+            painter.drawText(name_rect, Qt.AlignLeft | Qt.AlignVCenter, metrics.elidedText(name, Qt.ElideRight, name_rect.width()))
