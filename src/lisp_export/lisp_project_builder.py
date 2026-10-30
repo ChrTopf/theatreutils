@@ -9,8 +9,6 @@ AUDIO_EXTENSION = ".wav"
 # OSC command of the X32 that recalls the snippet in the given slot of the show.
 X32_LOAD_PATH = "/load"
 
-CUE_START_INDEX = 0
-
 # Everything around the cue list is taken over from a project saved by LiSP 0.6.5.
 PROJECT_META = {
     "plugins": {plugin: "0.6.5" for plugin in (
@@ -45,7 +43,7 @@ class LispProjectBuilder:
     The first address segment tells the relay which deck the message is for,
     e.g. `/x32/-action/gosnippet` or `/mq/pb/1/5`, and is removed by it.
 
-    Every action of a block becomes a cue named after the block. If a block has
+    Every action of a block becomes a cue named after the block (`<part> S<scene> B<id>`). If a block has
     several actions, each of its cues but the last one triggers the next cue
     right away (`TriggerAfterWait`), so a single GO executes all of them at once.
     """
@@ -62,21 +60,17 @@ class LispProjectBuilder:
         self.include_light = include_light
 
     def build(self, blocks: list[Block]) -> LispProject:
-        next_cue_number = CUE_START_INDEX
         cues = []
         cue_block_ids = []
         for block in blocks:
-            block_cues = self._block_cues(next_cue_number, block)
+            block_cues = self._block_cues(block)
             cues += block_cues
             cue_block_ids += [block.id] * len(block_cues)
-            if len(block_cues) > 0:
-                next_cue_number += 1
         for index, cue in enumerate(cues):
             cue["index"] = index
         return LispProject({"cues": cues, "meta": PROJECT_META, "session": PROJECT_SESSION}, cue_block_ids)
 
-    def _block_cues(self, number: int, block: Block) -> list[dict]:
-        block_name = f"L{number}"
+    def _block_cues(self, block: Block) -> list[dict]:
         cues = []
         if self.include_mutes and block.id in self.snippet_numbers:
             cues.append(self._mute_cue(block))
@@ -85,8 +79,8 @@ class LispProjectBuilder:
         if self.include_light and block.light:
             cues.append(self._light_cue(block))
 
-        for i, cue in enumerate(cues):
-            cue["name"] = block_name if i == 0 else f'└{block_name}'
+        for cue in cues:
+            cue["name"] = block.cue_name()
         for cue in cues[:-1]:
             cue["next_action"] = "TriggerAfterWait"
         return cues

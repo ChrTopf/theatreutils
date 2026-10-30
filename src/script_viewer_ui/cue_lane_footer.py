@@ -7,7 +7,7 @@ from script_viewer_ui.cue_lanes import LANES, CueLane, CueLaneSegments
 from script_viewer_ui.cue_style import CueStyle
 from script_viewer_ui.row_layout import RowLayout
 
-# Shown in place of a cue name if no further cue follows in the lane.
+# Shown in place of a cue label if no further cue follows in the lane.
 NO_NEXT_CUE = "—"
 
 
@@ -43,7 +43,7 @@ class CueLaneFooter(QWidget):
         for lane in layout.lanes:
             label = layout.lane_rect(lane, theme.LANE_LABEL_MARGIN, self._label_height)
             segment = self._cue_lanes.next_segment(lane, self._current_row)
-            name = segment.names[0] if segment else NO_NEXT_CUE
+            name = segment.label if segment else NO_NEXT_CUE
             color = segment.color if segment else theme.MUTED_LABEL
 
             painter.setPen(color)

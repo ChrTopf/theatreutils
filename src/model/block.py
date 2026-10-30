@@ -4,13 +4,7 @@ from typing import Optional
 
 @dataclass
 class Block:
-    """A single unit of the textbook: spoken dialogue, a stage direction, or a tech cue.
-
-    Deliberately excludes actor/mic/characters-present information - those are
-    correlated against the character roster in a later step, not stored here.
-    The only exception are the `mute` / `unmute` actor names, which that later
-    step (see MicAnnotator) writes back onto the block.
-    """
+    """A single unit of the textbook: spoken dialogue, a stage direction, or a tech cue."""
 
     id: int
     type: str
@@ -24,6 +18,9 @@ class Block:
     unmute: list[str] = field(default_factory=list)
     audio_effect: Optional[str] = None
     light: Optional[str] = None
+
+    def cue_name(self) -> str:
+        return f"{self.part} S{self.scene} B{self.id}"
 
     @classmethod
     def from_dict(cls, data: dict) -> "Block":

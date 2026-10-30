@@ -84,9 +84,11 @@ if __name__ == "__main__":
     paths = SnippetWriter().write(snippets, args.snp_output_dir, args.theater_name)
     print(f"Wrote {len(paths)} snippets to '{args.snp_output_dir}'.")
 
-    light_cue_numbers = LightCueAssigner().assign(blocks)
+    light_cue_assigner = LightCueAssigner()
+    light_cue_numbers = light_cue_assigner.assign(blocks)
+    light_cue_names = light_cue_assigner.cue_names(blocks)
     if args.light_output:
-        LightCueListWriter().write(light_cue_numbers, blocks, args.light_output)
+        LightCueListWriter().write(light_cue_numbers, light_cue_names, blocks, args.light_output)
         print(f"Wrote {len(light_cue_numbers)} light cues to '{args.light_output}'.")
 
     if args.cast_output:
@@ -104,6 +106,7 @@ if __name__ == "__main__":
         print(f"Wrote {len(lisp_project.cues)} cues to '{args.lisp_output}'.")
 
     if args.script_output:
-        script = ScriptBuilder().build(blocks, snippets, snippet_numbers, light_cue_numbers, lisp_project)
+        script = ScriptBuilder().build(blocks, snippets, snippet_numbers, light_cue_numbers, light_cue_names,
+                                       lisp_project)
         ScriptWriter().write(script, args.script_output)
         print(f"Wrote the script with {len(script.blocks)} blocks to '{args.script_output}'.")

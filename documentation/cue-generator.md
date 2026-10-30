@@ -83,8 +83,7 @@ channel and parameter of the console untouched. If an actor is muted and unmuted
 
 - Files are named `<theater-name>.<3-digit-number>.snp` and numbered from `001` in the order of the play, just like
   X32-Edit names them. Non-ASCII characters are replaced by `?`.
-- Snippets are named after their position in the play: `A<act>S<scene> B<block id>`, e.g. `A2S3 B415`. A part without
-  a number uses its initial, e.g. `VS1 B4` for `Vorspann`.
+- Snippets are named after their position in the play: `<part> S<scene> B<block id>`, e.g. `2. Akt S3 B415`.
 - The X32 holds 100 snippets per show. If more are generated, a warning is printed to stderr (the files are written
   anyway). Raise `--threshold-turns` of the Script Parser or merge mic changes in the workbook to reduce the number.
 
@@ -101,7 +100,7 @@ order, each one only if its flag is given and the block has the corresponding ac
 | `--lisp-audio` | Media cue | Plays `<Audio Effect>.wav` (the extension is added if missing). The file is expected next to the `.lsp` file. |
 | `--lisp-light` | OSC cue | `/mq/pb/<playback>/<cue>` without arguments: makes the MagicQ playback jump to the cue of the light effect. |
 
-All cues of a block are named `<part> Scene <scene> Block <id>`. If a block has several cues, every cue but the last
+All cues of a block are named `<part> S<scene> B<id>`, e.g. `2. Akt S3 B415`. If a block has several cues, every cue but the last
 one triggers the next one right away, so a single GO in LiSP executes all actions of the block.
 
 LiSP sends all OSC messages to one host. The prefixes `/x32` and `/mq` tell the [OSC Relay](osc-relay.md) which deck a
@@ -112,12 +111,13 @@ The X32 snippets have to be loaded into the show on the console (e.g. with X32-E
 ### Light cue list
 
 Every distinct light effect name of the `Light` column gets one MagicQ cue number, numbered from 1 in order of first
-appearance. An effect used by several blocks reuses its cue, so it only has to be programmed once. The CSV has the
-columns:
+appearance. An effect used by several blocks reuses its cue, so it only has to be programmed once. The cue is named
+after the first block triggering it: `<part> S<scene> B<id>`. The CSV has the columns:
 
 | Column | Description |
 | - | - |
 | `Cue` | The cue number on the MagicQ playback given by `--magicq-playback` |
+| `Name` | The name of the cue to enter on the MagicQ |
 | `Effect` | The name of the light effect from the workbook |
 | `Blocks` | Comma separated IDs of the blocks triggering the effect |
 

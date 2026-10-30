@@ -3,18 +3,23 @@ from script_viewer_ui import theme
 from script_viewer_ui.cue_lane import CueLane
 from script_viewer_ui.cue_segment import CueSegment
 
-LISP_LANE = CueLane("LiSP Cues", theme.LISP_LANE)
-X32_LANE = CueLane("X32 Snippets", theme.X32_LANE)
-LIGHT_CUE_LANE = CueLane("Light Cues", theme.LIGHT_CUE_LANE)
+LISP_LANE = CueLane("LiSP Cues", "L", theme.LISP_LANE)
+X32_LANE = CueLane("X32 Snippets", "S", theme.X32_LANE)
+LIGHT_CUE_LANE = CueLane("Light Cues", "Q", theme.LIGHT_CUE_LANE)
 
 # The lanes from left to right.
 LANES = (LISP_LANE, X32_LANE, LIGHT_CUE_LANE)
+
+# Separates the names of several cues of one deck triggered by the same block.
+CUE_NAME_SEPARATOR = ", "
+
+# The segments of a lane are numbered from this number on.
+FIRST_SEGMENT_NUMBER = 1
 
 class CueLaneSegments:
     """The cue segments of every lane, in the order of LANES."""
 
     def __init__(self, script: Script):
-        self._blocks = script.blocks
         self._row_count = len(script.blocks)
         self._rows_of_blocks = {block.id: row for row, block in enumerate(script.blocks)}
         self._names: tuple[dict[int, list[str]], ...] = tuple({} for _ in LANES)
@@ -27,7 +32,7 @@ class CueLaneSegments:
             for block_id in cue.block_ids:
                 self._add(block_id, LIGHT_CUE_LANE, cue.name)
 
-        self._segments = tuple(self._build_segments(names_by_row) for names_by_row in self._names)
+        self._segments = tuple(self._build_segments(lane, self._names[LANES.index(lane)]) for lane in LANES)
 
     def of_lane(self, lane: CueLane) -> list[CueSegment]:
         return self._segments[LANES.index(lane)]
@@ -35,25 +40,23 @@ class CueLaneSegments:
     def next_segment(self, lane: CueLane, row: int) -> CueSegment | None:
         return next((segment for segment in self.of_lane(lane) if segment.first_row > row), None)
 
-    def name_count(self, row: int, lanes: tuple[CueLane, ...]) -> int:
-        return max((len(self._names[LANES.index(lane)].get(row, [])) for lane in lanes), default=0)
+    def starts_segment(self, row: int, lanes: tuple[CueLane, ...]) -> bool:
+        return any(row in self._names[LANES.index(lane)] for lane in lanes)
 
     def _add(self, block_id: int, lane: CueLane, name: str) -> None:
         row = self._rows_of_blocks.get(block_id)
         if row is not None:
-            self._names[LANES.index(lane)].setdefault(row, []).append(name[:theme.CUE_NAME_LENGTH])
+            self._names[LANES.index(lane)].setdefault(row, []).append(name)
 
-    def _build_segments(self, names_by_row: dict[int, list[str]]) -> list[CueSegment]:
+    def _build_segments(self, lane: CueLane, names_by_row: dict[int, list[str]]) -> list[CueSegment]:
         first_rows = sorted(names_by_row)
         segments = []
-        for number, first_row in enumerate(first_rows):
-            is_last = number + 1 == len(first_rows)
-            last_row = self._row_count - 1 if is_last else first_rows[number + 1] - 1
-            color = theme.CUE_COLORS[number % len(theme.CUE_COLORS)]
-            segments.append(CueSegment(first_row, last_row, tuple(names_by_row[first_row]),
-                                       self._location(first_row), color))
+        for index, first_row in enumerate(first_rows):
+            is_last = index + 1 == len(first_rows)
+            last_row = self._row_count - 1 if is_last else first_rows[index + 1] - 1
+            label = f"{lane.prefix}{index + FIRST_SEGMENT_NUMBER}"
+            # Cues of one block share their name, which is shown only once.
+            name = CUE_NAME_SEPARATOR.join(dict.fromkeys(names_by_row[first_row]))
+            color = theme.CUE_COLORS[index % len(theme.CUE_COLORS)]
+            segments.append(CueSegment(first_row, last_row, label, name, color))
         return segments
-
-    def _location(self, row: int) -> str:
-        block = self._blocks[row]
-        return f"{block.part} S{block.scene} B{block.id}"

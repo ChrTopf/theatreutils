@@ -3,17 +3,12 @@ from PyQt5.QtGui import QColor
 
 @dataclass(frozen=True)
 class CueSegment:
-    """The rows a cue stays active for: from the block triggering it up to the block triggering the next cue.
-
-    If a block triggers several cues of the same deck at once, they share one
-    segment and all of their names are listed. Below the names, the location
-    tells where the triggering block is: `<part letter>S<scene> B<block>`.
-    """
+    """The rows a cue stays active for: from the block triggering it up to the block triggering the next cue."""
 
     first_row: int
     last_row: int
-    names: tuple[str, ...]
-    location: str
+    label: str
+    name: str
     color: QColor
 
     def contains(self, row: int) -> bool:

@@ -3,15 +3,16 @@ from dataclasses import dataclass, field
 
 @dataclass
 class LightCueEntry:
-    """A light cue to be programmed into the MagicQ and the blocks triggering it."""
+    """A light cue to be programmed into the MagicQ, the light effect it shows and the blocks triggering it."""
 
     cue: int
     name: str
+    effect: str
     block_ids: list[int] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict) -> "LightCueEntry":
-        return cls(cue=data["cue"], name=data["name"], block_ids=list(data["block_ids"]))
+        return cls(cue=data["cue"], name=data["name"], effect=data["effect"], block_ids=list(data["block_ids"]))
 
     def to_dict(self) -> dict:
-        return {"cue": self.cue, "name": self.name, "block_ids": self.block_ids}
+        return {"cue": self.cue, "name": self.name, "effect": self.effect, "block_ids": self.block_ids}

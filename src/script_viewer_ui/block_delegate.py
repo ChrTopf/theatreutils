@@ -28,15 +28,7 @@ class _Columns:
 
 
 class BlockDelegate(QStyledItemDelegate):
-    """Paints one block as a card of a document: character and text left, cues right.
-
-    The left column of the card holds the character name above its spoken text
-    or stage direction, the right column holds the mic, audio and light cues of
-    the block. The cue lanes right of the card span many rows, so they are
-    painted by the BlockListView; the card only grows tall enough for the cue
-    names it starts in the visible lanes. The current block is drawn in white on a lighter card with
-    a border, every other block is dimmed.
-    """
+    """Paints one block as a card of a document: character and text left, cues right."""
 
     def __init__(self, cue_lanes: CueLaneSegments, parent=None):
         super().__init__(parent)
@@ -76,11 +68,11 @@ class BlockDelegate(QStyledItemDelegate):
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         block = index.data(BLOCK_ROLE)
-        cue_name_count = self._cue_lanes.name_count(index.row(), self._visible_lanes)
+        starts_segment = self._cue_lanes.starts_segment(index.row(), self._visible_lanes)
         card_width = self._row_layout(option.rect).card_width
         key = (block.id, card_width)
         if key not in self._card_heights:
-            self._card_heights[key] = self._card_height(block, cue_name_count, card_width)
+            self._card_heights[key] = self._card_height(block, starts_segment, card_width)
         return QSize(card_width, self._card_heights[key] + theme.BLOCK_SPACING)
 
     @staticmethod
@@ -113,11 +105,11 @@ class BlockDelegate(QStyledItemDelegate):
             painter.drawText(line, Qt.AlignLeft | Qt.AlignVCenter, text)
             line.translate(0, line_height)
 
-    def _card_height(self, block: Block, cue_name_count: int, card_width: int) -> int:
+    def _card_height(self, block: Block, starts_segment: bool, card_width: int) -> int:
         columns = self._columns(card_width)
         text_height = self._text_document(block, columns.text, is_current=False).size().height()
         cue_height = len(self._cue_lines(block, is_current=False)) * QFontMetrics(self._cue_font()).lineSpacing()
-        label_height = CueStyle.cue_label_height(cue_name_count)
+        label_height = CueStyle.cue_label_height() if starts_segment else 0
         return math.ceil(max(text_height, cue_height, label_height)) + 2 * theme.BLOCK_PADDING
 
     def _row_layout(self, row: QRect) -> RowLayout:
