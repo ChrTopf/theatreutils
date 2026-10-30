@@ -1,3 +1,5 @@
+from PyQt5.QtGui import QColor
+
 from model.script import Script
 from script_viewer_ui import theme
 from script_viewer_ui.cue_lane import CueLane
@@ -17,22 +19,26 @@ CUE_NAME_SEPARATOR = ", "
 FIRST_SEGMENT_NUMBER = 1
 
 class CueLaneSegments:
-    """The cue segments of every lane, in the order of LANES."""
+    """The cue segments of every lane, in the order of LANES.
+
+    LiSP segments take the background color of their cues in LiSP, all other segments the color of their lane.
+    """
 
     def __init__(self, script: Script):
         self._row_count = len(script.blocks)
         self._rows_of_blocks = {block.id: row for row, block in enumerate(script.blocks)}
         self._names: tuple[dict[int, list[str]], ...] = tuple({} for _ in LANES)
+        self._colors: tuple[dict[int, QColor], ...] = tuple({} for _ in LANES)
 
         for cue in script.lisp_cues:
-            self._add(cue.block_id, LISP_LANE, cue.name)
+            self._add(cue.block_id, LISP_LANE, cue.name, QColor(cue.color))
         for snippet in script.x32_snippets:
-            self._add(snippet.block_id, X32_LANE, snippet.name)
+            self._add(snippet.block_id, X32_LANE, snippet.name, X32_LANE.color)
         for cue in script.light_cues:
             for block_id in cue.block_ids:
-                self._add(block_id, LIGHT_CUE_LANE, cue.name)
+                self._add(block_id, LIGHT_CUE_LANE, cue.name, LIGHT_CUE_LANE.color)
 
-        self._segments = tuple(self._build_segments(lane, self._names[LANES.index(lane)]) for lane in LANES)
+        self._segments = tuple(self._build_segments(lane) for lane in LANES)
 
     def of_lane(self, lane: CueLane) -> list[CueSegment]:
         return self._segments[LANES.index(lane)]
@@ -43,12 +49,15 @@ class CueLaneSegments:
     def starts_segment(self, row: int, lanes: tuple[CueLane, ...]) -> bool:
         return any(row in self._names[LANES.index(lane)] for lane in lanes)
 
-    def _add(self, block_id: int, lane: CueLane, name: str) -> None:
+    def _add(self, block_id: int, lane: CueLane, name: str, color: QColor) -> None:
         row = self._rows_of_blocks.get(block_id)
         if row is not None:
             self._names[LANES.index(lane)].setdefault(row, []).append(name)
+            self._colors[LANES.index(lane)].setdefault(row, color)
 
-    def _build_segments(self, lane: CueLane, names_by_row: dict[int, list[str]]) -> list[CueSegment]:
+    def _build_segments(self, lane: CueLane) -> list[CueSegment]:
+        names_by_row = self._names[LANES.index(lane)]
+        colors_by_row = self._colors[LANES.index(lane)]
         first_rows = sorted(names_by_row)
         segments = []
         for index, first_row in enumerate(first_rows):
@@ -57,6 +66,5 @@ class CueLaneSegments:
             label = f"{lane.prefix}{index + FIRST_SEGMENT_NUMBER}"
             # Cues of one block share their name, which is shown only once.
             name = CUE_NAME_SEPARATOR.join(dict.fromkeys(names_by_row[first_row]))
-            color = theme.CUE_COLORS[index % len(theme.CUE_COLORS)]
-            segments.append(CueSegment(first_row, last_row, label, name, color))
+            segments.append(CueSegment(first_row, last_row, label, name, colors_by_row[first_row]))
         return segments

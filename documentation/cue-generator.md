@@ -103,6 +103,10 @@ order, each one only if its flag is given and the block has the corresponding ac
 All cues of a block are named `<part> S<scene> B<id>`, e.g. `2. Akt S3 B415`. If a block has several cues, every cue but the last
 one triggers the next one right away, so a single GO in LiSP executes all actions of the block.
 
+Every cue gets a background color in the LiSP cue list. All cues of a block share one color, the next block with cues
+takes the next color in turns of blue, green, red, orange, purple and brown, so neighbouring blocks are easy to tell
+apart. Yellow is never used.
+
 LiSP sends all OSC messages to one host. The prefixes `/x32` and `/mq` tell the [OSC Relay](osc-relay.md) which deck a
 message is for. The relay must be running during the show.
 

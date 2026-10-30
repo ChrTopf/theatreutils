@@ -91,12 +91,12 @@ triggering it by the block ID.
 
 ```json
 {
-    "version": 2,
+    "version": 3,
     "blocks": [
         {"id": 7, "type": "dialogue", "part": "1. Akt", "scene": 1, "page": 2, "text": "...", "character": "Hugo",
          "direction": null, "mute": ["Ben"], "unmute": ["Anna"], "audio_effect": null, "light": "Spot Hugo"}
     ],
-    "lisp_cues": [{"index": 4, "name": "1. Akt S1 B7", "description": "Executes multiple actions at once", "block_id": 7}],
+    "lisp_cues": [{"index": 4, "name": "1. Akt S1 B7", "description": "Executes multiple actions at once", "color": "#3584e4", "block_id": 7}],
     "x32_snippets": [{"number": 2, "name": "1. Akt S1 B7", "block_id": 7}],
     "light_cues": [{"cue": 2, "name": "1. Akt S1 B7", "effect": "Spot Hugo", "block_ids": [7, 19, 31]}]
 }
@@ -107,9 +107,9 @@ named after the first of them.
 
 | Key | Description |
 | - | - |
-| `version` | The version of the format, currently `2` |
+| `version` | The version of the format, currently `3` |
 | `blocks` | The blocks of the Blocks sheet with the same fields as its columns |
-| `lisp_cues` | Every cue of the `.lsp` project: its `index` in the LiSP cue list, `name`, `description` and `block_id`. Empty if no `--lisp-output` is given |
+| `lisp_cues` | Every cue of the `.lsp` project: its `index` in the LiSP cue list, `name`, `description`, background `color` and `block_id`. Empty if no `--lisp-output` is given |
 | `x32_snippets` | Every generated snippet: its `number` on the X32 (= number of the `.snp` file), `name` and `block_id` |
 | `light_cues` | Every light cue: its MagicQ `cue` number, `name`, the light `effect` and the `block_ids` triggering it |
 

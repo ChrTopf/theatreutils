@@ -30,8 +30,9 @@ class ScriptBuilder:
     def _lisp_cues(lisp_project: Optional[LispProject]) -> list[LispCueEntry]:
         if lisp_project is None:
             return []
-        return [LispCueEntry(index=cue["index"], name=cue["name"], description=cue["description"], block_id=block_id)
-                for cue, block_id in zip(lisp_project.cues, lisp_project.cue_block_ids)]
+        return [LispCueEntry(index=cue["index"], name=cue["name"], description=cue["description"], color=color,
+                             block_id=block_id)
+                for cue, block_id, color in zip(lisp_project.cues, lisp_project.cue_block_ids, lisp_project.cue_colors)]
 
     @staticmethod
     def _snippets(snippets: list[X32Snippet], snippet_numbers: dict[int, int]) -> list[SnippetEntry]:

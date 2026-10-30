@@ -9,6 +9,10 @@ AUDIO_EXTENSION = ".wav"
 # OSC command of the X32 that recalls the snippet in the given slot of the show.
 X32_LOAD_PATH = "/load"
 
+# The background colors of the cues in the LiSP cue list, taken by the blocks in turns, so neighbouring blocks differ.
+# Yellow must never be used.
+CUE_COLORS = ("#3584e4", "#57e389", "#e01b24", "#ff7800", "#9141ac", "#986a44")
+
 # Everything around the cue list is taken over from a project saved by LiSP 0.6.5.
 PROJECT_META = {
     "plugins": {plugin: "0.6.5" for plugin in (
@@ -33,20 +37,7 @@ PROJECT_SESSION = {
 
 
 class LispProjectBuilder:
-    """Turns the blocks into a Linux Show Player project with one cue per mic change, audio effect and light effect.
-
-    - Mic changes recall the X32 snippet generated for the block via OSC.
-    - Audio effects play `<Audio Effect>.wav`, located next to the project file.
-    - Light effects make the MagicQ jump to the pre-programmed cue of the effect via OSC.
-
-    LiSP sends all OSC messages to a single host, the OSC relay (osc_relay.py).
-    The first address segment tells the relay which deck the message is for,
-    e.g. `/x32/-action/gosnippet` or `/mq/pb/1/5`, and is removed by it.
-
-    Every action of a block becomes a cue named after the block (`<part> S<scene> B<id>`). If a block has
-    several actions, each of its cues but the last one triggers the next cue
-    right away (`TriggerAfterWait`), so a single GO executes all of them at once.
-    """
+    """Turns the blocks into a Linux Show Player project with one cue per mic change, audio effect and light effect."""
 
     def __init__(self, cue_factory: LispCueFactory, magicq: MagicQOsc,
                  snippet_numbers: dict[int, int], light_cue_numbers: dict[str, int],
@@ -62,13 +53,22 @@ class LispProjectBuilder:
     def build(self, blocks: list[Block]) -> LispProject:
         cues = []
         cue_block_ids = []
+        cue_colors = []
+        color_number = 0
         for block in blocks:
             block_cues = self._block_cues(block)
+            if not block_cues:
+                continue
+            color = CUE_COLORS[color_number % len(CUE_COLORS)]
+            color_number += 1
+            for cue in block_cues:
+                self.cue_factory.set_color(cue, color)
             cues += block_cues
             cue_block_ids += [block.id] * len(block_cues)
+            cue_colors += [color] * len(block_cues)
         for index, cue in enumerate(cues):
             cue["index"] = index
-        return LispProject({"cues": cues, "meta": PROJECT_META, "session": PROJECT_SESSION}, cue_block_ids)
+        return LispProject({"cues": cues, "meta": PROJECT_META, "session": PROJECT_SESSION}, cue_block_ids, cue_colors)
 
     def _block_cues(self, block: Block) -> list[dict]:
         cues = []

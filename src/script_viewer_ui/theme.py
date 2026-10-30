@@ -63,23 +63,13 @@ DIMMED_AUDIO_EFFECT = QColor("#356079")
 LIGHT = QColor("#ffe066")
 DIMMED_LIGHT = QColor("#7d7039")
 
-# The cue lanes: the color of the lane name in the header.
+# The cue lanes: the color of the lane name in the header. The X32 and light cues are drawn in their lane's color,
+# the LiSP cues in the colors they have in LiSP.
 LISP_LANE = QColor("#c39bff")
 X32_LANE = QColor("#4fd8c4")
 LIGHT_CUE_LANE = QColor("#ffb84d")
 LANE_LABEL_BACKGROUND = QColor(13, 13, 15, 235)
 
-# The cues within a lane take turns with these colors, so neighbouring cues differ.
-CUE_COLORS = (
-    QColor("#ff6b6b"),
-    QColor("#4dabf7"),
-    QColor("#ffd43b"),
-    QColor("#69db7c"),
-    QColor("#da77f2"),
-    QColor("#ff922b"),
-    QColor("#3bc9db"),
-    QColor("#f783ac"),
-)
 # Cues that are not active at the current block are darkened by this factor, see QColor.darker().
 DIMMED_CUE_FACTOR = 220
 

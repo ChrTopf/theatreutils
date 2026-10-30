@@ -39,7 +39,7 @@
                         "band9": 0
                     },
                     "UriInput": {
-                        "_mtime": 1791397839.8694322,
+                        "_mtime": 1791021359.0,
                         "buffer_size": -1,
                         "download": false,
                         "duration": 1175,
@@ -67,7 +67,7 @@
             "next_action": "DoNothing",
             "post_wait": 0.0,
             "pre_wait": 0.0,
-            "stylesheet": "font-size:10pt;",
+            "stylesheet": "background:#3584e4;font-size:10pt;",
             "timecode": {
                 "enabled": false,
                 "replace_hours": false,
@@ -124,7 +124,7 @@
             "path": "/load",
             "post_wait": 0.0,
             "pre_wait": 0.0,
-            "stylesheet": "font-size:10pt;",
+            "stylesheet": "background:#57e389;font-size:10pt;",
             "timecode": {
                 "enabled": false,
                 "replace_hours": false,
@@ -156,7 +156,7 @@
             "path": "/mq/pb/1/2",
             "post_wait": 0.0,
             "pre_wait": 0.0,
-            "stylesheet": "font-size:10pt;",
+            "stylesheet": "background:#e01b24;font-size:10pt;",
             "timecode": {
                 "enabled": false,
                 "replace_hours": false,
@@ -213,7 +213,7 @@
             "path": "/load",
             "post_wait": 0.0,
             "pre_wait": 0.0,
-            "stylesheet": "font-size:11pt;",
+            "stylesheet": "background:#ff7800;font-size:11pt;",
             "timecode": {
                 "enabled": false,
                 "replace_hours": false,
@@ -260,7 +260,7 @@
                         "band9": 0
                     },
                     "UriInput": {
-                        "_mtime": 1791397839.8694322,
+                        "_mtime": 1791021359.0,
                         "buffer_size": -1,
                         "download": false,
                         "duration": 1175,
@@ -288,7 +288,7 @@
             "next_action": "DoNothing",
             "post_wait": 0.0,
             "pre_wait": 0.0,
-            "stylesheet": "font-size:11pt;",
+            "stylesheet": "background:#ff7800;font-size:11pt;",
             "timecode": {
                 "enabled": false,
                 "replace_hours": false,
@@ -345,7 +345,7 @@
             "path": "/load",
             "post_wait": 0.0,
             "pre_wait": 0.0,
-            "stylesheet": "font-size:11pt;",
+            "stylesheet": "background:#9141ac;font-size:11pt;",
             "timecode": {
                 "enabled": false,
                 "replace_hours": false,
@@ -386,17 +386,17 @@
             "selection_mode": false,
             "view_sizes": [
                 [
-                    205,
-                    727
+                    442,
+                    1569
                 ],
                 [
-                    210,
-                    1274,
-                    418
+                    422,
+                    2560,
+                    840
                 ],
                 [
-                    1487,
-                    419
+                    2985,
+                    841
                 ]
             ]
         },

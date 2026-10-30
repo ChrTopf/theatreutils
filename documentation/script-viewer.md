@@ -25,7 +25,7 @@ Without `--input` a file dialog asks for the script. Cancelling the dialog quits
 | `--input <file>` | no | file dialog | The script (`.json`) written by the cue generator with `--script-output`. |
 | `-h`, `--help` | no | | Prints the help and exits. |
 
-The program exits with an error message if the file cannot be read or is not a script of format version 2.
+The program exits with an error message if the file cannot be read or is not a script of format version 3.
 
 ## The window
 
@@ -61,7 +61,8 @@ blocks are dimmed.
 ### Cue lanes
 
 Right of the cards, one lane per deck shows which cue is active. A colored bar starts at the block triggering a cue and
-runs down to the block triggering the next cue of that deck. Neighbouring cues have different colors. Beside the start
+runs down to the block triggering the next cue of that deck. LiSP cues are drawn in the background color they have in
+LiSP, so neighbouring cues differ; X32 snippets and light cues are drawn in the color of their lane. Beside the start
 of its bar, the segment is labeled in large bold letters with a letter and its number within the lane. The viewer
 numbers the segments of every lane itself, starting at 1:
 
