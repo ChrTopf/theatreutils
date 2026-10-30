@@ -10,8 +10,20 @@ AUDIO_EXTENSION = ".wav"
 X32_LOAD_PATH = "/load"
 
 # The background colors of the cues in the LiSP cue list, taken by the blocks in turns, so neighbouring blocks differ.
+# All share a relative luminance of about 0.16-0.18, so white text on them reaches a contrast of at least 4.5:1 and the
+# colors as text on the dark Script Viewer cards at least 3.6:1. They are ordered so that neighbours are far apart in hue.
 # Yellow must never be used.
-CUE_COLORS = ("#3584e4", "#57e389", "#e01b24", "#ff7800", "#9141ac", "#986a44")
+CUE_COLORS = (
+    "#2868e8",  # blue
+    "#c85000",  # orange
+    "#008080",  # teal
+    "#d02890",  # magenta
+    "#0078b0",  # azure
+    "#e02030",  # red
+    "#9848e0",  # purple
+    "#986a44",  # brown
+    "#208838",  # green
+)
 
 # Everything around the cue list is taken over from a project saved by LiSP 0.6.5.
 PROJECT_META = {
