@@ -10,6 +10,7 @@ class CueSegment:
     label: str
     name: str
     color: QColor
+    details: tuple[str, ...]
 
     def contains(self, row: int) -> bool:
         return self.first_row <= row <= self.last_row

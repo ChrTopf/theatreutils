@@ -17,6 +17,14 @@ class CueStyle:
         return font
 
     @staticmethod
-    def cue_label_height() -> int:
-        """The height of a segment's label: its number above the name of its cue."""
-        return QFontMetrics(CueStyle.cue_name_font()).lineSpacing() + QFontMetrics(CueStyle.cue_location_font()).lineSpacing()
+    def cue_detail_font() -> QFont:
+        font = QFont()
+        font.setPointSize(theme.CUE_POINT_SIZE)
+        font.setBold(True)
+        return font
+
+    @staticmethod
+    def cue_label_height(detail_count: int) -> int:
+        return (QFontMetrics(CueStyle.cue_name_font()).lineSpacing()
+                + QFontMetrics(CueStyle.cue_location_font()).lineSpacing()
+                + detail_count * QFontMetrics(CueStyle.cue_detail_font()).lineSpacing())

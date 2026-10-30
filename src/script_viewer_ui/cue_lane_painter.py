@@ -39,7 +39,7 @@ class CueLanePainter:
     def _paint_label(painter: QPainter, lane_rect: QRect, top: int, bottom: int,
                      segment: CueSegment, color: QColor) -> None:
         label_top = max(top + theme.BLOCK_PADDING, theme.CUE_NAME_STICKY_MARGIN)
-        label_top = min(label_top, bottom - CueStyle.cue_label_height())
+        label_top = min(label_top, bottom - CueStyle.cue_label_height(len(segment.details)))
 
         left = lane_rect.x() + theme.CUE_BAR_WIDTH + theme.LANE_LABEL_PADDING
         width = lane_rect.right() - left - theme.LANE_LABEL_PADDING
@@ -58,3 +58,13 @@ class CueLanePainter:
         line.setHeight(metrics.lineSpacing())
         painter.drawText(line, Qt.AlignLeft | Qt.AlignVCenter,
                          metrics.elidedText(segment.name, Qt.ElideRight, line.width()))
+        line.translate(0, metrics.lineSpacing())
+
+        font = CueStyle.cue_detail_font()
+        painter.setFont(font)
+        metrics = QFontMetrics(font)
+        line.setHeight(metrics.lineSpacing())
+        for detail in segment.details:
+            painter.drawText(line, Qt.AlignLeft | Qt.AlignVCenter,
+                             metrics.elidedText(detail, Qt.ElideRight, line.width()))
+            line.translate(0, metrics.lineSpacing())

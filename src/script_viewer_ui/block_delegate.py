@@ -1,9 +1,8 @@
 import html
 import math
-from dataclasses import dataclass
 
 from PyQt5.QtCore import QModelIndex, QRect, QRectF, QSize, Qt
-from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen, QTextDocument
+from PyQt5.QtGui import QColor, QPainter, QPen, QTextDocument
 from PyQt5.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
 
 from model.block import Block
@@ -13,22 +12,9 @@ from script_viewer_ui.cue_lanes import LANES, CueLane, CueLaneSegments
 from script_viewer_ui.cue_style import CueStyle
 from script_viewer_ui.row_layout import RowLayout
 
-UNMUTE_PREFIX = "▲ "
-MUTE_PREFIX = "▼ "
-AUDIO_PREFIX = "♪ "
-LIGHT_PREFIX = "☀ "
-
-
-@dataclass(frozen=True)
-class _Columns:
-    """Widths of the two columns of a block card."""
-
-    text: int
-    cues: int
-
 
 class BlockDelegate(QStyledItemDelegate):
-    """Paints one block as a card of a document: character and text left, cues right."""
+    """Paints one block as a card of a document: the character above the text. Its cues are shown in the cue lanes."""
 
     def __init__(self, cue_lanes: CueLaneSegments, parent=None):
         super().__init__(parent)
@@ -55,24 +41,21 @@ class BlockDelegate(QStyledItemDelegate):
         is_current = index.data(IS_CURRENT_ROLE)
         layout = self._row_layout(option.rect)
         card = layout.card_rect(option.rect.y(), option.rect.height() - theme.BLOCK_SPACING)
-        columns = self._columns(card.width())
 
         painter.save()
         painter.setRenderHint(QPainter.Antialiasing)
         self._paint_card(painter, card, is_current)
 
         content = card.adjusted(theme.BLOCK_PADDING, theme.BLOCK_PADDING, -theme.BLOCK_PADDING, -theme.BLOCK_PADDING)
-        self._paint_text(painter, content, columns, block, is_current)
-        self._paint_cues(painter, content, columns, block, is_current)
+        self._paint_text(painter, content, block, is_current)
         painter.restore()
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         block = index.data(BLOCK_ROLE)
-        starts_segment = self._cue_lanes.starts_segment(index.row(), self._visible_lanes)
         card_width = self._row_layout(option.rect).card_width
         key = (block.id, card_width)
         if key not in self._card_heights:
-            self._card_heights[key] = self._card_height(block, starts_segment, card_width)
+            self._card_heights[key] = self._card_height(block, index.row(), card_width)
         return QSize(card_width, self._card_heights[key] + theme.BLOCK_SPACING)
 
     @staticmethod
@@ -80,46 +63,28 @@ class BlockDelegate(QStyledItemDelegate):
         painter.setBrush(theme.CURRENT_BLOCK if is_current else theme.BLOCK)
         if is_current:
             painter.setPen(QPen(theme.CURRENT_MARKER, theme.CURRENT_BORDER_WIDTH))
-            # The pen is centered on the outline, so the rect is inset by half its width.
             outline = QRectF(card).adjusted(1, 1, -1, -1)
         else:
             painter.setPen(Qt.NoPen)
             outline = QRectF(card)
         painter.drawRoundedRect(outline, theme.BLOCK_CORNER_RADIUS, theme.BLOCK_CORNER_RADIUS)
 
-    def _paint_text(self, painter: QPainter, content: QRect, columns: _Columns, block: Block, is_current: bool) -> None:
-        document = self._text_document(block, columns.text, is_current)
+    def _paint_text(self, painter: QPainter, content: QRect, block: Block, is_current: bool) -> None:
+        document = self._text_document(block, content.width(), is_current)
         painter.save()
         painter.translate(content.topLeft())
         document.drawContents(painter)
         painter.restore()
 
-    def _paint_cues(self, painter: QPainter, content: QRect, columns: _Columns, block: Block, is_current: bool) -> None:
-        font = self._cue_font()
-        painter.setFont(font)
-        line_height = QFontMetrics(font).lineSpacing()
-
-        line = QRect(content.right() - columns.cues, content.top(), columns.cues, line_height)
-        for text, color in self._cue_lines(block, is_current):
-            painter.setPen(color)
-            painter.drawText(line, Qt.AlignLeft | Qt.AlignVCenter, text)
-            line.translate(0, line_height)
-
-    def _card_height(self, block: Block, starts_segment: bool, card_width: int) -> int:
-        columns = self._columns(card_width)
-        text_height = self._text_document(block, columns.text, is_current=False).size().height()
-        cue_height = len(self._cue_lines(block, is_current=False)) * QFontMetrics(self._cue_font()).lineSpacing()
-        label_height = CueStyle.cue_label_height() if starts_segment else 0
-        return math.ceil(max(text_height, cue_height, label_height)) + 2 * theme.BLOCK_PADDING
+    def _card_height(self, block: Block, row: int, card_width: int) -> int:
+        text_width = card_width - 2 * theme.BLOCK_PADDING
+        text_height = self._text_document(block, text_width, is_current=False).size().height()
+        label_height = max((CueStyle.cue_label_height(len(segment.details))
+                            for segment in self._cue_lanes.starting_at(row, self._visible_lanes)), default=0)
+        return math.ceil(max(text_height, label_height)) + 2 * theme.BLOCK_PADDING
 
     def _row_layout(self, row: QRect) -> RowLayout:
         return RowLayout(row.x(), row.width() or self._viewport_width, self._visible_lanes)
-
-    @staticmethod
-    def _columns(card_width: int) -> _Columns:
-        inner = card_width - 2 * theme.BLOCK_PADDING
-        cues = min(theme.CUE_COLUMN_WIDTH, inner // 3)
-        return _Columns(text=inner - cues - theme.COLUMN_GAP, cues=cues)
 
     @staticmethod
     def _text_document(block: Block, width: int, is_current: bool) -> QTextDocument:
@@ -128,24 +93,6 @@ class BlockDelegate(QStyledItemDelegate):
         document.setHtml(_block_html(block, is_current))
         document.setTextWidth(width)
         return document
-
-    @staticmethod
-    def _cue_lines(block: Block, is_current: bool) -> list[tuple[str, QColor]]:
-        lines = [(UNMUTE_PREFIX + name, theme.UNMUTE if is_current else theme.DIMMED_UNMUTE) for name in block.unmute]
-        lines += [(MUTE_PREFIX + name, theme.MUTE if is_current else theme.DIMMED_MUTE) for name in block.mute]
-        if block.audio_effect:
-            lines.append((AUDIO_PREFIX + block.audio_effect,
-                          theme.AUDIO_EFFECT if is_current else theme.DIMMED_AUDIO_EFFECT))
-        if block.light:
-            lines.append((LIGHT_PREFIX + block.light, theme.LIGHT if is_current else theme.DIMMED_LIGHT))
-        return lines
-
-    @staticmethod
-    def _cue_font() -> QFont:
-        font = QFont()
-        font.setPointSize(theme.CUE_POINT_SIZE)
-        font.setBold(True)
-        return font
 
 
 def _block_html(block: Block, is_current: bool) -> str:
