@@ -68,5 +68,15 @@ BAR = QColor("#16161a")
 BAR_BORDER = QColor("#26262c")
 MUTED_LABEL = QColor("#8c8c96")
 
+# The bar below the page holding the GO button for LiSP.
+GO_POINT_SIZE = 28
+GO_BUTTON_WIDTH = 280
+GO_BUTTON_HEIGHT = 80
+GO_BLINK_INTERVAL_MS = 500
+GO_ARMED = QColor("#26a269")
+GO_ARMED_BLINK = QColor("#57e389")
+GO_ARMED_TEXT = QColor("#ffffff")
+LISP_CUE_POINT_SIZE = 22
+
 SCROLLBAR_HANDLE = QColor("#3a3a44")
 SCROLLBAR_HANDLE_HOVER = QColor("#4f4f5c")

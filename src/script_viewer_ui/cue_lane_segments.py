@@ -59,6 +59,12 @@ class CueLaneSegments:
     def next_segment(self, lane: CueLane, row: int) -> CueSegment | None:
         return next((segment for segment in self.of_lane(lane) if segment.first_row > row), None)
 
+    def segment_at(self, lane: CueLane, row: int) -> CueSegment | None:
+        return next((segment for segment in self.of_lane(lane) if segment.contains(row)), None)
+
+    def lisp_cue_number(self, row: int) -> int | None:
+        return self._numbers[LANES.index(LISP_LANE)].get(row)
+
     def starting_at(self, row: int, lanes: tuple[CueLane, ...]) -> list[CueSegment]:
         segments = (self._segments_by_first_row[LANES.index(lane)].get(row) for lane in lanes)
         return [segment for segment in segments if segment is not None]

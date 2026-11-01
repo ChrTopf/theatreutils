@@ -2,9 +2,12 @@ from light_export.magicq_osc import MagicQOsc
 from lisp_export.lisp_cue_factory import LispCueFactory
 from lisp_export.lisp_project import LispProject
 from model.block import Block
-from osc_routing.deck_routes import MAGICQ_ROUTE, X32_ROUTE
+from osc_routing.deck_routes import LISP_CUE_ADDRESS, MAGICQ_ROUTE, X32_ROUTE
 
 AUDIO_EXTENSION = ".wav"
+
+# LiSP shows the cues numbered from 1, while their internal index starts at 0.
+FIRST_CUE_NUMBER = 1
 
 # OSC command of the X32 that recalls the snippet in the given slot of the show.
 X32_LOAD_PATH = "/load"
@@ -66,6 +69,7 @@ class LispProjectBuilder:
         cues = []
         cue_block_ids = []
         cue_colors = []
+        first_cues_of_blocks = []
         color_number = 0
         for block in blocks:
             block_cues = self._block_cues(block)
@@ -78,8 +82,11 @@ class LispProjectBuilder:
             cues += block_cues
             cue_block_ids += [block.id] * len(block_cues)
             cue_colors += [color] * len(block_cues)
+            first_cues_of_blocks.append(block_cues[0])
         for index, cue in enumerate(cues):
             cue["index"] = index
+        for cue in first_cues_of_blocks:
+            self.cue_factory.set_osc_trigger(cue, LISP_CUE_ADDRESS, cue["index"] + FIRST_CUE_NUMBER)
         return LispProject({"cues": cues, "meta": PROJECT_META, "session": PROJECT_SESSION}, cue_block_ids, cue_colors)
 
     def _block_cues(self, block: Block) -> list[dict]:

@@ -12,6 +12,12 @@ MAX_LANE_WIDTH = 600
 POSITION_TOP = 0
 POSITION_BOTTOM = 100
 
+# LiSP's default OSC input port.
+DEFAULT_LISP_HOST = "127.0.0.1"
+DEFAULT_LISP_PORT = 9000
+MIN_PORT = 1
+MAX_PORT = 65535
+
 
 @dataclass
 class ViewerSettings:
@@ -24,6 +30,10 @@ class ViewerSettings:
     show_lisp_lane: bool = True
     show_x32_lane: bool = False
     show_light_cue_lane: bool = False
+    lisp_sync: bool = False
+    lisp_host: str = DEFAULT_LISP_HOST
+    lisp_port: int = DEFAULT_LISP_PORT
+    go_on_return: bool = False
 
     @classmethod
     def load(cls, path: str = SETTINGS_PATH) -> "ViewerSettings":
@@ -44,6 +54,9 @@ class ViewerSettings:
                 setattr(settings, setting.name, value)
         settings.lane_width = _clamp(settings.lane_width, MIN_LANE_WIDTH, MAX_LANE_WIDTH)
         settings.current_block_position = _clamp(settings.current_block_position, POSITION_TOP, POSITION_BOTTOM)
+        settings.lisp_host = settings.lisp_host.strip() or DEFAULT_LISP_HOST
+        if not MIN_PORT <= settings.lisp_port <= MAX_PORT:
+            settings.lisp_port = DEFAULT_LISP_PORT
         return settings
 
     def save(self, path: str = SETTINGS_PATH) -> None:

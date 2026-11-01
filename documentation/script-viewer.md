@@ -96,6 +96,32 @@ lane, `—` is shown. Right of each label, a counter in the same large
 letters shows how many blocks lie ahead until that cue is triggered; `1` means the next block triggers it. Hiding all lanes
 also hides the strip.
 
+### LiSP bar
+
+If [LiSP synchronization](#settings) is enabled, a bar across the whole width of the window below the document lets the
+Script Viewer start the LiSP cues itself instead of pressing GO in LiSP. This keeps the viewer and LiSP in step, even if
+the wrong cue is selected in LiSP or GO is pressed too often or not often enough.
+
+From left to right, directly next to each other at the right edge of the bar:
+
+| Element | Description |
+| - | - |
+| `Last LiSP cue` | The label and name of the LiSP cue last started with the GO button, e.g. `L5  1. Akt S3 B142`, in its color. `—` until the first GO. |
+| `Next LiSP cue` | The LiSP cue the GO button will start, in the same form. `—` if the GO button is disabled. |
+| `GO` | Large button at the right edge. Sends `/lisp/cue ,i <number>` to LiSP to start the next LiSP cue. |
+
+The LiSP cue of the current block is the one whose bar in the LiSP Cues lane covers the block, so it is either
+triggered by the block itself or by the closest block above it that triggers a LiSP cue. The GO button is enabled, green and
+blinking while that cue is not the one started last. Otherwise, and above the first LiSP cue, it is grey and
+cannot be pressed. Pressing it starts the cue and disables it again. Moving to another block does nothing in LiSP until
+GO is pressed, so you can pick the right block first. If a block triggers several LiSP cues, the first one is started,
+and LiSP then starts the others itself.
+
+If the message cannot be sent, for example because the host is unknown, a warning is shown and the button stays
+enabled. OSC over UDP is not acknowledged, so the viewer cannot tell whether LiSP actually received the message.
+
+The last cue is only kept while the viewer is running. Disabling the synchronization hides the whole bar.
+
 ## Settings
 
 The `Settings` button in the top bar opens the settings window. `OK` applies the changes right away and saves them to
@@ -109,6 +135,9 @@ at every start. If it is missing or contains invalid values, the defaults are us
 | Current block position | `current_block_position` | `0` | Where the current block is kept within the view, from `0` (top) over `50` (center) to `100` (bottom). Chosen with a slider. |
 | Lane letters | `lane_letter_prefixes` | `true` | Labels the cues with the letter of their lane (`L`, `S`, `Q`). If off, all lanes use `#`. |
 | Mutes in the LiSP lane | `mutes_in_lisp_lane` | `false` | Additionally lists the X32 mutes and unmutes in the LiSP Cues lane. |
+| LiSP synchronization | `lisp_sync` | `false` | Shows the [LiSP bar](#lisp-bar) with the GO button. |
+| LiSP OSC address | `lisp_host`, `lisp_port` | `127.0.0.1`, `9000` | Host (IP address or host name) and port LiSP receives OSC on, see [LiSP](lisp.md). Only editable while the synchronization is enabled. |
+| GO on Return | `go_on_return` | `false` | The `Return` key presses the GO button, see [Navigation](#navigation). Only editable while the synchronization is enabled. |
 
 ## Navigation
 
@@ -121,8 +150,13 @@ at every start. If it is missing or contains invalid values, the defaults are us
 | `Home` / `End` | First / last block |
 | Mouse click | Makes the clicked block the current one |
 | Part / scene selectors | Jump to a scene |
+| `GO` button | Starts the next LiSP cue, see [LiSP bar](#lisp-bar) |
+| `Return`, `Enter` | Presses the GO button if GO on Return is enabled in the [settings](#settings) and the GO button is enabled. Otherwise nothing. Holding the key down does not repeat it. |
 
-The script document keeps the keyboard focus after using the selectors or the settings, so the keys keep working.
+The `Return` and `Enter` keys are reserved for the GO button and have no other function.
+
+The script document keeps the keyboard focus after using the selectors, the settings or the GO button, so the keys keep
+working.
 
 Note that the Space key is also LiSP's default GO key. If the [Buzzer](buzzer.md) is used to trigger LiSP via the
 [Serial Keyboard](serial-keyboard.md), the key press goes to whichever window has the focus, so keep LiSP focused

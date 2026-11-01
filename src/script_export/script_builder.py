@@ -1,6 +1,7 @@
 from typing import Optional
 
 from lisp_export.lisp_project import LispProject
+from lisp_export.lisp_project_builder import FIRST_CUE_NUMBER
 from model.block import Block
 from model.light_cue_entry import LightCueEntry
 from model.lisp_cue_entry import LispCueEntry
@@ -26,7 +27,7 @@ class ScriptBuilder:
     def _lisp_cues(lisp_project: Optional[LispProject]) -> list[LispCueEntry]:
         if lisp_project is None:
             return []
-        return [LispCueEntry(number=cue["index"] + 1, name=cue["name"], description=cue["description"], color=color,
+        return [LispCueEntry(number=cue["index"] + FIRST_CUE_NUMBER, name=cue["name"], description=cue["description"], color=color,
                              block_id=block_id)
                 for cue, block_id, color in zip(lisp_project.cues, lisp_project.cue_block_ids, lisp_project.cue_colors)]
 

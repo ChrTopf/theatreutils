@@ -14,5 +14,10 @@ The generated projects target LiSP version 0.6.5. Things to keep in mind when us
 - The audio files (`<Audio Effect>.wav`) must be placed next to the `.lsp` file.
 - LiSP sends all OSC cues to one global destination. Configure it to the host and port of the
   [OSC Relay](osc-relay.md) (LiSP's default, `localhost:9001`, matches the relay's default).
-- The GO key (Space by default) can be pressed with the [Buzzer](buzzer.md) and the
-  [Serial Keyboard](serial-keyboard.md).
+- The first cue of every block listens for the OSC message `/lisp/cue ,i <number>` (number in the cue list, from 1),
+  which the GO button of the [Script Viewer](script-viewer.md#lisp-bar) sends. LiSP receives OSC on the input port of
+  its OSC settings (`9000` by default). Enter that host and port in the Script Viewer's settings. It must differ from the
+  port the [OSC Relay](osc-relay.md) listens on.
+- Alternatively, the GO key (Space by default) can be pressed with the [Buzzer](buzzer.md) and the
+  [Serial Keyboard](serial-keyboard.md). This may get LiSP out of step with the Script Viewer if the wrong cue is
+  selected or GO is pressed too often.
