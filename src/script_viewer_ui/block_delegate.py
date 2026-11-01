@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
 from model.block import Block
 from script_viewer_ui import theme
 from script_viewer_ui.block_list_model import BLOCK_ROLE, IS_CURRENT_ROLE
-from script_viewer_ui.cue_lanes import LANES, CueLane, CueLaneSegments
+from script_viewer_ui.cue_lane_segments import LANES, CueLane, CueLaneSegments
 from script_viewer_ui.cue_style import CueStyle
 from script_viewer_ui.row_layout import RowLayout
 
@@ -20,16 +20,19 @@ class BlockDelegate(QStyledItemDelegate):
         super().__init__(parent)
         self._cue_lanes = cue_lanes
         self._visible_lanes = LANES
+        self._lane_width = theme.LANE_WIDTH
         self._viewport_width = 0
         self._card_heights: dict[tuple[int, int], int] = {}
 
     def set_visible_lanes(self, lanes: tuple[CueLane, ...]) -> None:
-        """Tells the delegate which cue lanes share the row with the cards, which changes their width and height."""
         self._visible_lanes = lanes
         self._card_heights.clear()
 
+    def set_lane_width(self, width: int) -> None:
+        self._lane_width = width
+        self._card_heights.clear()
+
     def set_viewport_width(self, width: int) -> bool:
-        """Tells the delegate how wide the cards may be. Returns True if that changed the layout."""
         if width == self._viewport_width:
             return False
         self._viewport_width = width
@@ -84,7 +87,7 @@ class BlockDelegate(QStyledItemDelegate):
         return math.ceil(max(text_height, label_height)) + 2 * theme.BLOCK_PADDING
 
     def _row_layout(self, row: QRect) -> RowLayout:
-        return RowLayout(row.x(), row.width() or self._viewport_width, self._visible_lanes)
+        return RowLayout(row.x(), row.width() or self._viewport_width, self._visible_lanes, self._lane_width)
 
     @staticmethod
     def _text_document(block: Block, width: int, is_current: bool) -> QTextDocument:
@@ -96,7 +99,6 @@ class BlockDelegate(QStyledItemDelegate):
 
 
 def _block_html(block: Block, is_current: bool) -> str:
-    """The left column of a block: the character name above its text, as rich text."""
     paragraphs = []
     if block.character:
         color = theme.CHARACTER if is_current else theme.DIMMED_CHARACTER
@@ -109,7 +111,6 @@ def _block_html(block: Block, is_current: bool) -> str:
 
 
 def _text_html(block: Block, is_current: bool) -> str:
-    """The stage direction in brackets followed by the text of the block."""
     parts = []
     if block.direction:
         color = theme.DIRECTION_TEXT if is_current else theme.DIMMED_DIRECTION_TEXT

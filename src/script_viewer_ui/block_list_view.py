@@ -8,34 +8,26 @@ from script_viewer_ui.block_list_model import BlockListModel
 from script_viewer_ui.cue_lane_footer import CueLaneFooter
 from script_viewer_ui.cue_lane_header import CueLaneHeader
 from script_viewer_ui.cue_lane_painter import CueLanePainter
-from script_viewer_ui.cue_lanes import LANES, CueLane
+from script_viewer_ui.cue_lane_segments import LISP_LANE, X32_LANE, LIGHT_CUE_LANE, LANES
 from script_viewer_ui.row_layout import RowLayout
+from script_viewer_ui.viewer_settings import POSITION_BOTTOM, POSITION_TOP, ViewerSettings
+from script_viewer_ui.cue_lane import CueLane
 
-# One notch of a regular mouse wheel, see QWheelEvent.angleDelta().
 WHEEL_NOTCH = 120
 PAGE_STEP = 10
 RELAYOUT_DELAY_MS = 100
 
 
 class BlockListView(QListView):
-    """The document of block cards, navigated block by block instead of pixel by pixel.
-
-    The scroll wheel and the arrow keys move the current block, which is always
-    kept in the vertical center of the view. Clicking a block makes it current.
-
-    The cue lanes right of the cards span many rows, so they are painted over
-    the whole viewport after the rows. Their names sit in a header above the
-    viewport, so they never cover the cue bars, and the next cue of every lane
-    sits in a footer below it, so it is always visible. Hidden lanes make room
-    for wider cards; if all lanes are hidden, so are the header and the footer.
-    """
+    """The document of block cards, navigated block by block instead of pixel by pixel."""
 
     current_row_changed = pyqtSignal(int)
 
-    def __init__(self, model: BlockListModel, parent=None):
+    def __init__(self, model: BlockListModel, settings: ViewerSettings, parent=None):
         super().__init__(parent)
         self._wheel_delta = 0
-        self._visible_lanes = LANES
+        self._visible_lanes = self._get_visible_lanes(settings)
+        self._settings = settings
         self._delegate = BlockDelegate(model.cue_lanes, self)
         self._cue_lane_painter = CueLanePainter(model.cue_lanes)
         self.setModel(model)
@@ -54,14 +46,13 @@ class BlockListView(QListView):
         self._footer = CueLaneFooter(model.cue_lanes, self)
         self._footer.set_current_row(model.current_row)
         self._update_lane_margins()
-
-        # Wrapped text changes its height whenever the width changes, so all cards have
-        # to be re-measured - but only once the resizing has settled down.
+        
         self._relayout_timer = QTimer(self, singleShot=True, interval=RELAYOUT_DELAY_MS)
         self._relayout_timer.timeout.connect(self._relayout)
 
         self.clicked.connect(self._on_clicked)
         self._delegate.set_viewport_width(self.viewport().width())
+        self.apply_settings(settings)
 
     @property
     def _block_model(self) -> BlockListModel:
@@ -72,28 +63,29 @@ class BlockListView(QListView):
         if row < 0:
             return
         self._block_model.set_current_row(row)
-        self._center_current_row()
-        # The highlighted cues span far more rows than the two the model reports as changed.
+        self._scroll_to_current_row()
         self.viewport().update()
         self._footer.set_current_row(row)
         self.current_row_changed.emit(row)
 
-    def set_visible_lanes(self, lanes: tuple[CueLane, ...]) -> None:
-        self._visible_lanes = lanes
-        self._delegate.set_visible_lanes(lanes)
-        self._header.set_visible_lanes(lanes)
-        self._footer.set_visible_lanes(lanes)
+    def apply_settings(self, settings: ViewerSettings) -> None:
+        self._settings = settings
+        self._visible_lanes = self._get_visible_lanes(settings)
+        self._delegate.set_visible_lanes(self._visible_lanes)
+        self._header.set_visible_lanes(self._visible_lanes)
+        self._footer.set_visible_lanes(self._visible_lanes)
         self._update_lane_margins()
-        # The cards change their width and with it the height of their wrapped text.
+        self._delegate.set_lane_width(settings.lane_width)
+        self._header.set_lane_width(settings.lane_width)
+        self._footer.set_lane_width(settings.lane_width)
         self.scheduleDelayedItemsLayout()
-        self._center_current_row()
+        self._scroll_to_current_row()
         self.viewport().update()
 
     def move_by(self, steps: int) -> None:
         self.set_current_row(self._block_model.current_row + steps)
 
     def wheelEvent(self, event: QWheelEvent) -> None:
-        # Touchpads report many small deltas, so they are accumulated to full notches.
         self._wheel_delta += event.angleDelta().y()
         steps = int(self._wheel_delta / WHEEL_NOTCH)
         if steps:
@@ -122,15 +114,18 @@ class BlockListView(QListView):
         super().resizeEvent(event)
         self._place_lane_bars()
         self._relayout_timer.start()
-        self._center_current_row()
+        self._scroll_to_current_row()
 
     def paintEvent(self, event: QPaintEvent) -> None:
         super().paintEvent(event)
         painter = QPainter(self.viewport())
         painter.setRenderHint(QPainter.Antialiasing)
-        self._cue_lane_painter.paint(painter, RowLayout(0, self.viewport().width(), self._visible_lanes),
+        layout = RowLayout(0, self.viewport().width(), self._visible_lanes, self._settings.lane_width)
+        self._cue_lane_painter.paint(painter, 
+                                     layout, 
                                      self.viewport().height(),
-                                     self._block_model.current_row, self._row_span)
+                                     self._block_model.current_row, 
+                                     self._row_span)
 
     def scrollContentsBy(self, dx: int, dy: int) -> None:
         # Scrolling moves the already painted pixels, which would drag the sticky cue names along.
@@ -162,11 +157,22 @@ class BlockListView(QListView):
     def _relayout(self) -> None:
         if self._delegate.set_viewport_width(self.viewport().width()):
             self.scheduleDelayedItemsLayout()
-        self._center_current_row()
+        self._scroll_to_current_row()
 
-    def _center_current_row(self) -> None:
-        if self._block_model.rowCount() > 0:
-            self.scrollTo(self._block_model.index(self._block_model.current_row), QAbstractItemView.PositionAtCenter)
+    def _scroll_to_current_row(self) -> None:
+        if self._block_model.rowCount() == 0:
+            return
+        row = self.visualRect(self._block_model.index(self._block_model.current_row))
+        free_space = max(self.viewport().height() - row.height(), 0)
+        position = self._settings.current_block_position - POSITION_TOP
+        target_top = free_space * position // (POSITION_BOTTOM - POSITION_TOP)
+        scroll_bar = self.verticalScrollBar()
+        scroll_bar.setValue(scroll_bar.value() + row.top() - target_top)
+
+    def _get_visible_lanes(self, settings: ViewerSettings) -> tuple[CueLane, ...]:
+        shown = {LISP_LANE: settings.show_lisp_lane, X32_LANE: settings.show_x32_lane,
+                 LIGHT_CUE_LANE: settings.show_light_cue_lane}
+        return tuple(lane for lane in LANES if shown[lane])
 
 
 _STYLE_SHEET = f"""

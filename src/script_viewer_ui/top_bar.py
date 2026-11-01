@@ -1,27 +1,20 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QWidget
+from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QPushButton, QWidget
 
 from model.block import Block
 from script_viewer_ui import theme
-from script_viewer_ui.cue_lane_toggles import CueLaneToggles
 from script_viewer_ui.scene_index import SceneIndex
 
 
-class SceneJumpBar(QWidget):
-    """The bar above the document: jump to a scene of a part, show or hide the cue lanes, and the current position.
-
-    Picking a part jumps to its first scene, picking a scene jumps to its first
-    block. Both selectors also follow along while the show is being read, so
-    they always show where the current block is located.
-    """
+class TopBar(QWidget):
 
     scene_selected = pyqtSignal(int)
+    settings_requested = pyqtSignal()
 
-    def __init__(self, index: SceneIndex, block_count: int, lane_toggles: CueLaneToggles, parent=None):
+    def __init__(self, index: SceneIndex, block_count: int, parent=None):
         super().__init__(parent)
         self._index = index
         self._block_count = block_count
-        # Guards the selectors against emitting jumps while they are being synchronized.
         self._synchronizing = True
 
         self._part_box = QComboBox()
@@ -38,6 +31,12 @@ class SceneJumpBar(QWidget):
         self._part_box.setEnabled(enabled)
         self._scene_box.setEnabled(enabled)
 
+        settings_button = QPushButton("Settings")
+        settings_button.setObjectName("settingsButton")
+        settings_button.setFocusPolicy(Qt.NoFocus)
+        settings_button.setToolTip("Change the settings of the Script Viewer")
+        settings_button.clicked.connect(self.settings_requested)
+
         layout = QHBoxLayout(self)
         layout.setContentsMargins(theme.PAGE_MARGIN, 8, theme.PAGE_MARGIN, 8)
         layout.setSpacing(8)
@@ -47,14 +46,13 @@ class SceneJumpBar(QWidget):
         layout.addWidget(QLabel("Scene"))
         layout.addWidget(self._scene_box)
         layout.addStretch()
-        layout.addWidget(lane_toggles)
+        layout.addWidget(settings_button)
         layout.addSpacing(16)
         layout.addWidget(self._position_label)
 
         self.setStyleSheet(_STYLE_SHEET)
 
     def show_current_block(self, row: int, block: Block) -> None:
-        """Moves the selectors onto the part and scene of the given block, without jumping."""
         self._synchronizing = True
         try:
             part_index = self._part_box.findText(block.part)
@@ -80,7 +78,6 @@ class SceneJumpBar(QWidget):
             self._emit_selected_scene()
 
     def _fill_scenes(self, part: str) -> None:
-        # Filling the box must not look like the user picked the first scene.
         self._scene_box.blockSignals(True)
         self._scene_box.clear()
         for scene in self._index.scenes(part):
@@ -125,5 +122,17 @@ QComboBox QAbstractItemView {{
     selection-background-color: {theme.CURRENT_BLOCK.name()};
     selection-color: {theme.TEXT.name()};
     outline: none;
+}}
+QPushButton#settingsButton {{
+    background-color: {theme.PAGE.name()};
+    color: {theme.MUTED_LABEL.name()};
+    border: 1px solid {theme.BAR_BORDER.name()};
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: {theme.STATUS_POINT_SIZE}pt;
+    font-weight: bold;
+}}
+QPushButton#settingsButton:hover {{
+    color: {theme.TEXT.name()};
 }}
 """
