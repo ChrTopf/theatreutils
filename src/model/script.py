@@ -6,16 +6,12 @@ from model.light_cue_entry import LightCueEntry
 from model.lisp_cue_entry import LispCueEntry
 from model.snippet_entry import SnippetEntry
 
-FORMAT_VERSION = 3
+FORMAT_VERSION = 4
 
 
 @dataclass
 class Script:
-    """The script as exported by the cue generator for the script viewer.
-
-    Holds the blocks of the workbook together with the cues generated for the
-    decks, each of which refers back to the block(s) triggering it.
-    """
+    """The script as exported by the cue generator for the script viewer."""
 
     blocks: list[Block] = field(default_factory=list)
     lisp_cues: list[LispCueEntry] = field(default_factory=list)

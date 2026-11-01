@@ -148,6 +148,14 @@ block(s) triggering it. Its format is described in the README section
 [Script (JSON) Format](../README.md#script-json-format). The list of LiSP cues is empty if no `--lisp-output` is
 given.
 
+Every cue is saved with the number it has on its deck, so the Script Viewer shows the same numbers:
+
+| Cue | Number | Starts at |
+| - | - | - |
+| LiSP cue | Position in the LiSP cue list | 1 |
+| X32 snippet | Snippet slot on the console (file number minus one) | 0 |
+| Light cue | MagicQ cue number | 1 |
+
 ## Errors
 
 The program exits with an error message (exit code 1) if

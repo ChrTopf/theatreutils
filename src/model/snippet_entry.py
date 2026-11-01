@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 @dataclass
 class SnippetEntry:
-    """A generated X32 snippet, identified by its number on the console, and the block recalling it."""
 
     number: int
     name: str

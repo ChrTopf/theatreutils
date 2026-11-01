@@ -10,11 +10,7 @@ from snippet_export.x32_snippet import X32Snippet
 
 
 class ScriptBuilder:
-    """Collects the blocks and all cues generated for the decks into the Script read by the script viewer.
-
-    Every cue keeps a reference to the block(s) triggering it, so the viewer
-    can show it next to the text it belongs to.
-    """
+    """Collects the blocks and all cues generated for the decks into the Script read by the script viewer."""
 
     def build(self, blocks: list[Block], snippets: list[X32Snippet], snippet_numbers: dict[int, int],
               light_cue_numbers: dict[str, int], light_cue_names: dict[str, str],
@@ -30,14 +26,13 @@ class ScriptBuilder:
     def _lisp_cues(lisp_project: Optional[LispProject]) -> list[LispCueEntry]:
         if lisp_project is None:
             return []
-        return [LispCueEntry(index=cue["index"], name=cue["name"], description=cue["description"], color=color,
+        return [LispCueEntry(number=cue["index"] + 1, name=cue["name"], description=cue["description"], color=color,
                              block_id=block_id)
                 for cue, block_id, color in zip(lisp_project.cues, lisp_project.cue_block_ids, lisp_project.cue_colors)]
 
     @staticmethod
     def _snippets(snippets: list[X32Snippet], snippet_numbers: dict[int, int]) -> list[SnippetEntry]:
-        """Both the snippets and their numbers are in play order, see SnippetBuilder."""
-        return [SnippetEntry(number=number + 1, name=snippet.name, block_id=block_id)
+        return [SnippetEntry(number=number, name=snippet.name, block_id=block_id)
                 for (block_id, number), snippet in zip(snippet_numbers.items(), snippets)]
 
     @staticmethod
