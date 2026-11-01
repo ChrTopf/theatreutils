@@ -8,12 +8,7 @@ from script_viewer_ui.row_layout import RowLayout
 
 
 class CueLaneHeader(QWidget):
-    """The strip above the document holding the names of the visible cue lanes, each one centered over its lane.
-
-    It lies outside of the scrolled area, so the names never cover the cue bars.
-    Its width has to match the viewport of the document, so the RowLayout puts
-    the names over the same lanes as the rows below.
-    """
+    """The strip above the document holding the names of the visible cue lanes, each one centered over its lane."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -23,9 +18,14 @@ class CueLaneHeader(QWidget):
         self._label_height = QFontMetrics(self._font).height() + theme.LANE_LABEL_PADDING
         self.setFixedHeight(self._label_height + 2 * theme.LANE_LABEL_MARGIN)
         self._visible_lanes = LANES
+        self._lane_width = theme.LANE_WIDTH
 
     def set_visible_lanes(self, lanes: tuple[CueLane, ...]) -> None:
         self._visible_lanes = lanes
+        self.update()
+
+    def set_lane_width(self, width: int) -> None:
+        self._lane_width = width
         self.update()
 
     def paintEvent(self, event: QPaintEvent) -> None:
@@ -34,7 +34,7 @@ class CueLaneHeader(QWidget):
         painter.fillRect(self.rect(), theme.PAGE)
         painter.setFont(self._font)
         metrics = QFontMetrics(self._font)
-        layout = RowLayout(0, self.width(), self._visible_lanes)
+        layout = RowLayout(0, self.width(), self._visible_lanes, self._lane_width)
         radius = self._label_height / 2
 
         for lane in layout.lanes:

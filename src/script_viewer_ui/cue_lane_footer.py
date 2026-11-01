@@ -21,10 +21,15 @@ class CueLaneFooter(QWidget):
         self._label_height = QFontMetrics(self._font).height() + theme.LANE_LABEL_PADDING
         self.setFixedHeight(self._label_height + 2 * theme.LANE_LABEL_MARGIN)
         self._visible_lanes = LANES
+        self._lane_width = theme.LANE_WIDTH
         self._current_row = 0
 
     def set_visible_lanes(self, lanes: tuple[CueLane, ...]) -> None:
         self._visible_lanes = lanes
+        self.update()
+
+    def set_lane_width(self, width: int) -> None:
+        self._lane_width = width
         self.update()
 
     def set_current_row(self, row: int) -> None:
@@ -37,7 +42,7 @@ class CueLaneFooter(QWidget):
         painter.fillRect(self.rect(), theme.PAGE)
         painter.setFont(self._font)
         metrics = QFontMetrics(self._font)
-        layout = RowLayout(0, self.width(), self._visible_lanes)
+        layout = RowLayout(0, self.width(), self._visible_lanes, self._lane_width)
         radius = theme.BLOCK_CORNER_RADIUS
 
         for lane in layout.lanes:

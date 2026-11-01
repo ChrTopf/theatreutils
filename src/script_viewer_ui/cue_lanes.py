@@ -5,6 +5,7 @@ from model.script import Script
 from script_viewer_ui import theme
 from script_viewer_ui.cue_lane import CueLane
 from script_viewer_ui.cue_segment import CueSegment
+from script_viewer_ui.viewer_settings import ViewerSettings
 
 LISP_LANE = CueLane("LiSP Cues", "L", theme.LISP_LANE)
 X32_LANE = CueLane("X32 Snippets", "S", theme.X32_LANE)
@@ -18,6 +19,8 @@ CUE_NAME_SEPARATOR = ", "
 
 # The segments of a lane are numbered from this number on.
 FIRST_SEGMENT_NUMBER = 1
+# Replaces the letter of the lane in front of the segment numbers, unless the settings ask for the letters.
+NUMBER_PREFIX = "#"
 
 UNMUTE_PREFIX = "▲ "
 MUTE_PREFIX = "▼ "
@@ -27,7 +30,7 @@ LIGHT_PREFIX = "☀ "
 class CueLaneSegments:
     """The cue segments of every lane, in the order of LANES."""
 
-    def __init__(self, script: Script):
+    def __init__(self, script: Script, settings: ViewerSettings):
         self._blocks = script.blocks
         self._row_count = len(script.blocks)
         self._rows_of_blocks = {block.id: row for row, block in enumerate(script.blocks)}
@@ -42,6 +45,10 @@ class CueLaneSegments:
             for block_id in cue.block_ids:
                 self._add(block_id, LIGHT_CUE_LANE, cue.name, LIGHT_CUE_LANE.color)
 
+        self.apply_settings(settings)
+
+    def apply_settings(self, settings: ViewerSettings) -> None:
+        self._settings = settings
         self._segments = tuple(self._build_segments(lane) for lane in LANES)
         self._segments_by_first_row = tuple({segment.first_row: segment for segment in segments}
                                             for segments in self._segments)
@@ -66,24 +73,31 @@ class CueLaneSegments:
         names_by_row = self._names[LANES.index(lane)]
         colors_by_row = self._colors[LANES.index(lane)]
         first_rows = sorted(names_by_row)
+        prefix = lane.prefix if self._settings.lane_letter_prefixes else NUMBER_PREFIX
         segments = []
         for index, first_row in enumerate(first_rows):
             is_last = index + 1 == len(first_rows)
             last_row = self._row_count - 1 if is_last else first_rows[index + 1] - 1
-            label = f"{lane.prefix}{index + FIRST_SEGMENT_NUMBER}"
+            label = f"{prefix}{index + FIRST_SEGMENT_NUMBER}"
             name = CUE_NAME_SEPARATOR.join(dict.fromkeys(names_by_row[first_row]))
             details = self._details(lane, self._blocks[first_row])
             segments.append(CueSegment(first_row, last_row, label, name, colors_by_row[first_row], details))
         return segments
 
-    @staticmethod
-    def _details(lane: CueLane, block: Block) -> tuple[str, ...]:
-        if lane is LISP_LANE and block.audio_effect:
-            return (AUDIO_PREFIX + block.audio_effect,)
+    def _details(self, lane: CueLane, block: Block) -> tuple[str, ...]:
+        if lane is LISP_LANE:
+            details = self._mic_details(block) if self._settings.mutes_in_lisp_lane else []
+            if block.audio_effect:
+                details.append(AUDIO_PREFIX + block.audio_effect)
+            return tuple(details)
         if lane is X32_LANE:
-            unmutes = [UNMUTE_PREFIX + actor for actor in block.unmute]
-            mutes = [MUTE_PREFIX + actor for actor in block.mute]
-            return tuple(unmutes + mutes)
+            return tuple(self._mic_details(block))
         if lane is LIGHT_CUE_LANE and block.light:
             return (LIGHT_PREFIX + block.light,)
         return ()
+
+    @staticmethod
+    def _mic_details(block: Block) -> list[str]:
+        unmutes = [UNMUTE_PREFIX + actor for actor in block.unmute]
+        mutes = [MUTE_PREFIX + actor for actor in block.mute]
+        return unmutes + mutes

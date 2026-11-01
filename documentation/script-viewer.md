@@ -38,14 +38,16 @@ The window opens maximized and is titled `Script Viewer - <file name>`.
 | `Part` selector | Jumps to the first scene of the chosen part (`Vorspann`, `1. Akt`, ...). |
 | `Scene` selector | Jumps to the first block of the chosen scene within the selected part. |
 | Lane buttons | `LiSP Cues`, `X32 Snippets` and `Light Cues` show or hide the corresponding lane. A visible lane's button is outlined in the lane's color, a hidden one is grey. Hidden lanes make room for wider text. |
+| `Settings` | Opens the [settings window](#settings). |
 | Position | `Page <page> · Block <n> / <total>` of the current block. |
 
 Both selectors follow the current block, so they always show where in the show it is located.
 
 ### Block cards
 
-Every block is shown as a card. The current block is always centered vertically, drawn brightly and outlined; all other
-blocks are dimmed.
+Every block is shown as a card. The current block is always kept at the same height of the view (at the very top by
+default, see [Settings](#settings)), drawn brightly and outlined; all other blocks are dimmed. Near the beginning and the
+end of the script, the first and last blocks cannot scroll any further, so the current block may sit lower or higher.
 
 The card shows the character name in capitals above the text. A stage direction of a dialogue is shown in brackets and
 italics before the text. `acting` blocks are printed in italics, `command` blocks in bold. The actions of the block are
@@ -59,11 +61,13 @@ LiSP, so neighbouring cues differ; X32 snippets and light cues are drawn in the 
 of its bar, the segment is labeled in large bold letters with a letter and its number within the lane. The viewer
 numbers the segments of every lane itself, starting at 1:
 
-| Lane | Label |
-| - | - |
-| LiSP Cues | `L<number>`, e.g. `L1` |
-| X32 Snippets | `S<number>`, e.g. `S1` |
-| Light Cues | `Q<number>`, e.g. `Q1` |
+| Lane | Label | Label without lane letters |
+| - | - | - |
+| LiSP Cues | `L<number>`, e.g. `L1` | `#<number>`, e.g. `#1` |
+| X32 Snippets | `S<number>`, e.g. `S1` | `#<number>`, e.g. `#1` |
+| Light Cues | `Q<number>`, e.g. `Q1` | `#<number>`, e.g. `#1` |
+
+Which of the two is used is chosen in the [settings](#settings).
 
 If a block triggers several cues of one deck, they share one segment.
 
@@ -82,11 +86,30 @@ Below the name, the actions of the triggering block are listed in the lane of th
 
 The audio effect is only shown if the LiSP project contains a cue for it (`--lisp-audio` of the cue generator).
 
+If enabled in the [settings](#settings), the `▲` and `▼` lines of the X32 snippet are additionally listed in the LiSP
+Cues lane, above the audio effect, as LiSP triggers the snippet. They are only shown there if the block triggers a LiSP
+cue.
+
 Below the document, a fixed strip shows the label of the next cue of every visible lane under that lane, in the color
 its bar will have. It stays in place while scrolling, so the upcoming cues are always visible. If no cue follows in a
 lane, `—` is shown. Right of each label, a counter in the same large
 letters shows how many blocks lie ahead until that cue is triggered; `1` means the next block triggers it. Hiding all lanes
 also hides the strip.
+
+## Settings
+
+The `Settings` button in the top bar opens the settings window. `OK` applies the changes right away and saves them to
+`~/.theatreutils/script_viewer.json` in the home directory of the current user; `Cancel` discards them. The file is read
+at every start. If it is missing or contains invalid values, the defaults are used for them.
+
+| Setting | Key in the file | Default | Description |
+| - | - | - | - |
+| Cue lane width | `lane_width` | `300` | Width of every cue lane in pixels, from 150 to 600. Narrower lanes leave more room for the text. |
+| Current block position | `current_block_position` | `0` | Where the current block is kept within the view, from `0` (top) over `50` (center) to `100` (bottom). Chosen with a slider. |
+| Lane letters | `lane_letter_prefixes` | `true` | Labels the cues with the letter of their lane (`L`, `S`, `Q`). If off, all lanes use `#`. |
+| Mutes in the LiSP lane | `mutes_in_lisp_lane` | `false` | Additionally lists the X32 mutes and unmutes in the LiSP Cues lane. |
+
+The visibility of the lanes is not saved; all lanes are shown at every start.
 
 ## Navigation
 
