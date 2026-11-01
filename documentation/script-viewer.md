@@ -37,7 +37,6 @@ The window opens maximized and is titled `Script Viewer - <file name>`.
 | - | - |
 | `Part` selector | Jumps to the first scene of the chosen part (`Vorspann`, `1. Akt`, ...). |
 | `Scene` selector | Jumps to the first block of the chosen scene within the selected part. |
-| Lane buttons | `LiSP Cues`, `X32 Snippets` and `Light Cues` show or hide the corresponding lane. A visible lane's button is outlined in the lane's color, a hidden one is grey. Hidden lanes make room for wider text. |
 | `Settings` | Opens the [settings window](#settings). |
 | Position | `Page <page> · Block <n> / <total>` of the current block. |
 
@@ -104,12 +103,11 @@ at every start. If it is missing or contains invalid values, the defaults are us
 
 | Setting | Key in the file | Default | Description |
 | - | - | - | - |
+| Shown cue lanes | `show_lisp_lane`, `show_x32_lane`, `show_light_cue_lane` | `true`, `false`, `false` | Shows or hides the `LiSP Cues`, `X32 Snippets` and `Light Cues` lanes. Hidden lanes make room for wider text. |
 | Cue lane width | `lane_width` | `300` | Width of every cue lane in pixels, from 150 to 600. Narrower lanes leave more room for the text. |
 | Current block position | `current_block_position` | `0` | Where the current block is kept within the view, from `0` (top) over `50` (center) to `100` (bottom). Chosen with a slider. |
 | Lane letters | `lane_letter_prefixes` | `true` | Labels the cues with the letter of their lane (`L`, `S`, `Q`). If off, all lanes use `#`. |
 | Mutes in the LiSP lane | `mutes_in_lisp_lane` | `false` | Additionally lists the X32 mutes and unmutes in the LiSP Cues lane. |
-
-The visibility of the lanes is not saved; all lanes are shown at every start.
 
 ## Navigation
 
@@ -123,7 +121,7 @@ The visibility of the lanes is not saved; all lanes are shown at every start.
 | Mouse click | Makes the clicked block the current one |
 | Part / scene selectors | Jump to a scene |
 
-The script document keeps the keyboard focus after using the selectors or the lane buttons, so the keys keep working.
+The script document keeps the keyboard focus after using the selectors or the settings, so the keys keep working.
 
 Note that the Space key is also LiSP's default GO key. If the [Buzzer](buzzer.md) is used to trigger LiSP via the
 [Serial Keyboard](serial-keyboard.md), the key press goes to whichever window has the focus, so keep LiSP focused

@@ -3,7 +3,7 @@ from PyQt5.QtGui import QFont, QFontMetrics, QPainter, QPaintEvent
 from PyQt5.QtWidgets import QWidget
 
 from script_viewer_ui import theme
-from script_viewer_ui.cue_lanes import LANES, CueLane
+from script_viewer_ui.cue_lane_segments import LANES, CueLane
 from script_viewer_ui.row_layout import RowLayout
 
 

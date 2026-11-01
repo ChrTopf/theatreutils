@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
 from model.block import Block
 from script_viewer_ui import theme
 from script_viewer_ui.block_list_model import BLOCK_ROLE, IS_CURRENT_ROLE
-from script_viewer_ui.cue_lanes import LANES, CueLane, CueLaneSegments
+from script_viewer_ui.cue_lane_segments import LANES, CueLane, CueLaneSegments
 from script_viewer_ui.cue_style import CueStyle
 from script_viewer_ui.row_layout import RowLayout
 

@@ -3,7 +3,7 @@ from typing import Any
 from PyQt5.QtCore import QAbstractListModel, QModelIndex, Qt
 
 from model.block import Block
-from script_viewer_ui.cue_lanes import CueLaneSegments
+from script_viewer_ui.cue_lane_segments import CueLaneSegments
 
 # Custom roles exposing the whole Block of a row and whether it is the current one to the BlockDelegate.
 BLOCK_ROLE = Qt.UserRole + 1

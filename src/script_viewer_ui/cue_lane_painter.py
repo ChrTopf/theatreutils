@@ -4,7 +4,7 @@ from PyQt5.QtCore import QRect, QRectF, Qt
 from PyQt5.QtGui import QColor, QFontMetrics, QPainter
 
 from script_viewer_ui import theme
-from script_viewer_ui.cue_lanes import CueLaneSegments, CueSegment
+from script_viewer_ui.cue_lane_segments import CueLaneSegments, CueSegment
 from script_viewer_ui.cue_style import CueStyle
 from script_viewer_ui.row_layout import RowLayout
 

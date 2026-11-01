@@ -3,11 +3,10 @@ from PyQt5.QtGui import QFontMetrics, QPainter, QPaintEvent
 from PyQt5.QtWidgets import QWidget
 
 from script_viewer_ui import theme
-from script_viewer_ui.cue_lanes import LANES, CueLane, CueLaneSegments
+from script_viewer_ui.cue_lane_segments import LANES, CueLane, CueLaneSegments
 from script_viewer_ui.cue_style import CueStyle
 from script_viewer_ui.row_layout import RowLayout
 
-# Shown in place of a cue label if no further cue follows in the lane.
 NO_NEXT_CUE = "—"
 
 

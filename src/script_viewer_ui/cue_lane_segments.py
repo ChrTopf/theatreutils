@@ -27,6 +27,7 @@ MUTE_PREFIX = "▼ "
 AUDIO_PREFIX = "♪ "
 LIGHT_PREFIX = "☀ "
 
+
 class CueLaneSegments:
     """The cue segments of every lane, in the order of LANES."""
 

@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QRect
 
 from script_viewer_ui import theme
-from script_viewer_ui.cue_lanes import CueLane
+from script_viewer_ui.cue_lane_segments import CueLane
 
 MIN_CARD_WIDTH = 320
 

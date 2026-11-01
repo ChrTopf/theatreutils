@@ -21,6 +21,9 @@ class ViewerSettings:
     mutes_in_lisp_lane: bool = False
     lane_letter_prefixes: bool = True
     current_block_position: int = POSITION_TOP
+    show_lisp_lane: bool = True
+    show_x32_lane: bool = False
+    show_light_cue_lane: bool = False
 
     @classmethod
     def load(cls, path: str = SETTINGS_PATH) -> "ViewerSettings":

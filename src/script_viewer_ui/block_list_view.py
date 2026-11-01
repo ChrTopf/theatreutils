@@ -8,9 +8,10 @@ from script_viewer_ui.block_list_model import BlockListModel
 from script_viewer_ui.cue_lane_footer import CueLaneFooter
 from script_viewer_ui.cue_lane_header import CueLaneHeader
 from script_viewer_ui.cue_lane_painter import CueLanePainter
-from script_viewer_ui.cue_lanes import LANES, CueLane
+from script_viewer_ui.cue_lane_segments import LISP_LANE, X32_LANE, LIGHT_CUE_LANE, LANES
 from script_viewer_ui.row_layout import RowLayout
 from script_viewer_ui.viewer_settings import POSITION_BOTTOM, POSITION_TOP, ViewerSettings
+from script_viewer_ui.cue_lane import CueLane
 
 WHEEL_NOTCH = 120
 PAGE_STEP = 10
@@ -25,7 +26,7 @@ class BlockListView(QListView):
     def __init__(self, model: BlockListModel, settings: ViewerSettings, parent=None):
         super().__init__(parent)
         self._wheel_delta = 0
-        self._visible_lanes = LANES
+        self._visible_lanes = self._get_visible_lanes(settings)
         self._settings = settings
         self._delegate = BlockDelegate(model.cue_lanes, self)
         self._cue_lane_painter = CueLanePainter(model.cue_lanes)
@@ -67,18 +68,13 @@ class BlockListView(QListView):
         self._footer.set_current_row(row)
         self.current_row_changed.emit(row)
 
-    def set_visible_lanes(self, lanes: tuple[CueLane, ...]) -> None:
-        self._visible_lanes = lanes
-        self._delegate.set_visible_lanes(lanes)
-        self._header.set_visible_lanes(lanes)
-        self._footer.set_visible_lanes(lanes)
-        self._update_lane_margins()
-        self.scheduleDelayedItemsLayout()
-        self._scroll_to_current_row()
-        self.viewport().update()
-
     def apply_settings(self, settings: ViewerSettings) -> None:
         self._settings = settings
+        self._visible_lanes = self._get_visible_lanes(settings)
+        self._delegate.set_visible_lanes(self._visible_lanes)
+        self._header.set_visible_lanes(self._visible_lanes)
+        self._footer.set_visible_lanes(self._visible_lanes)
+        self._update_lane_margins()
         self._delegate.set_lane_width(settings.lane_width)
         self._header.set_lane_width(settings.lane_width)
         self._footer.set_lane_width(settings.lane_width)
@@ -172,6 +168,11 @@ class BlockListView(QListView):
         target_top = free_space * position // (POSITION_BOTTOM - POSITION_TOP)
         scroll_bar = self.verticalScrollBar()
         scroll_bar.setValue(scroll_bar.value() + row.top() - target_top)
+
+    def _get_visible_lanes(self, settings: ViewerSettings) -> tuple[CueLane, ...]:
+        shown = {LISP_LANE: settings.show_lisp_lane, X32_LANE: settings.show_x32_lane,
+                 LIGHT_CUE_LANE: settings.show_light_cue_lane}
+        return tuple(lane for lane in LANES if shown[lane])
 
 
 _STYLE_SHEET = f"""

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (QCheckBox, QDialog, QDialogButtonBox, QFormLayout, 
                              QSpinBox, QVBoxLayout)
 
 from script_viewer_ui import theme
+from script_viewer_ui.cue_lane_segments import LIGHT_CUE_LANE, LISP_LANE, X32_LANE
 from script_viewer_ui.viewer_settings import (MAX_LANE_WIDTH, MIN_LANE_WIDTH, POSITION_BOTTOM, POSITION_TOP,
                                               SETTINGS_PATH, ViewerSettings)
 
@@ -39,11 +40,25 @@ class SettingsDialog(QDialog):
         self._mutes_in_lisp_lane_box = QCheckBox("Show the X32 mutes and unmutes in the LiSP Cues lane as well")
         self._mutes_in_lisp_lane_box.setChecked(settings.mutes_in_lisp_lane)
 
+        self._show_lisp_lane_box = QCheckBox(LISP_LANE.name)
+        self._show_lisp_lane_box.setChecked(settings.show_lisp_lane)
+        self._show_x32_lane_box = QCheckBox(X32_LANE.name)
+        self._show_x32_lane_box.setChecked(settings.show_x32_lane)
+        self._show_light_cue_lane_box = QCheckBox(LIGHT_CUE_LANE.name)
+        self._show_light_cue_lane_box.setChecked(settings.show_light_cue_lane)
+
+        lanes_row = QHBoxLayout()
+        lanes_row.addWidget(self._show_lisp_lane_box)
+        lanes_row.addWidget(self._show_x32_lane_box)
+        lanes_row.addWidget(self._show_light_cue_lane_box)
+        lanes_row.addStretch()
+
         position_row = QHBoxLayout()
         position_row.addWidget(self._position_slider)
         position_row.addWidget(self._position_label)
 
         form = QFormLayout()
+        form.addRow("Shown cue lanes", lanes_row)
         form.addRow("Cue lane width", self._lane_width_box)
         form.addRow("Current block position", position_row)
         form.addRow(self._lane_letter_prefixes_box)
@@ -68,6 +83,9 @@ class SettingsDialog(QDialog):
             mutes_in_lisp_lane=self._mutes_in_lisp_lane_box.isChecked(),
             lane_letter_prefixes=self._lane_letter_prefixes_box.isChecked(),
             current_block_position=self._position_slider.value(),
+            show_lisp_lane=self._show_lisp_lane_box.isChecked(),
+            show_x32_lane=self._show_x32_lane_box.isChecked(),
+            show_light_cue_lane=self._show_light_cue_lane_box.isChecked(),
         )
 
     def _show_position(self, position: int) -> None:
