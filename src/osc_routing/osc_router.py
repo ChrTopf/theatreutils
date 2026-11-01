@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-# OSC strings are terminated by at least one null byte and padded to a multiple of 4 bytes.
-OSC_ALIGNMENT = 4
+from osc_routing.osc_message import OSC_ALIGNMENT, osc_string
+
 BUNDLE_MARKER = b"#bundle"
 
 
@@ -35,7 +35,7 @@ class OscRouter:
             raise ValueError(f"The OSC address '{address}' contains no address for the deck.")
 
         deck_address = "/" + "/".join(deck_segments)
-        return RoutedPacket(route, self._osc_string(deck_address) + rest)
+        return RoutedPacket(route, osc_string(deck_address) + rest)
 
     @staticmethod
     def _split_address(packet: bytes) -> tuple[str, bytes]:
@@ -46,9 +46,3 @@ class OscRouter:
             raise ValueError("The OSC address is not null terminated.")
         padded_length = (end // OSC_ALIGNMENT + 1) * OSC_ALIGNMENT
         return packet[:end].decode("ascii"), packet[padded_length:]
-
-    @staticmethod
-    def _osc_string(text: str) -> bytes:
-        encoded = text.encode("ascii") + b"\0"
-        padding = -len(encoded) % OSC_ALIGNMENT
-        return encoded + b"\0" * padding

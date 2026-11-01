@@ -103,6 +103,12 @@ order, each one only if its flag is given and the block has the corresponding ac
 All cues of a block are named `<part> S<scene> B<id>`, e.g. `2. Akt S3 B415`. If a block has several cues, every cue but the last
 one triggers the next one right away, so a single GO in LiSP executes all actions of the block.
 
+The first cue of every block can also be started by OSC, which is how the GO button of the
+[Script Viewer](script-viewer.md#lisp-bar) triggers it. Its OSC controller (LiSP's `Controller` plugin) listens for
+`/lisp/cue ,i <number>`, where `<number>` is the number of the cue in the LiSP cue list, starting at 1. LiSP's internal
+index, which starts at 0, is not used. The other cues of a block get no OSC trigger, because the cue before them already
+starts them.
+
 Every cue gets a background color in the LiSP cue list. All cues of a block share one color, the next block with cues
 takes the next color in turns of blue, green, red, orange, purple and brown, so neighbouring blocks are easy to tell
 apart. Yellow is never used.

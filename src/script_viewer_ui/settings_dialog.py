@@ -1,11 +1,11 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QCheckBox, QDialog, QDialogButtonBox, QFormLayout, QHBoxLayout, QLabel, QSlider,
-                             QSpinBox, QVBoxLayout)
+from PyQt5.QtWidgets import (QCheckBox, QDialog, QDialogButtonBox, QFormLayout, QHBoxLayout, QLabel, QLineEdit,
+                             QSlider, QSpinBox, QVBoxLayout)
 
 from script_viewer_ui import theme
 from script_viewer_ui.cue_lane_segments import LIGHT_CUE_LANE, LISP_LANE, X32_LANE
-from script_viewer_ui.viewer_settings import (MAX_LANE_WIDTH, MIN_LANE_WIDTH, POSITION_BOTTOM, POSITION_TOP,
-                                              SETTINGS_PATH, ViewerSettings)
+from script_viewer_ui.viewer_settings import (DEFAULT_LISP_HOST, MAX_LANE_WIDTH, MAX_PORT, MIN_LANE_WIDTH, MIN_PORT,
+                                              POSITION_BOTTOM, POSITION_TOP, SETTINGS_PATH, ViewerSettings)
 
 LANE_WIDTH_STEP = 10
 POSITION_TICK_INTERVAL = 25
@@ -47,6 +47,24 @@ class SettingsDialog(QDialog):
         self._show_light_cue_lane_box = QCheckBox(LIGHT_CUE_LANE.name)
         self._show_light_cue_lane_box.setChecked(settings.show_light_cue_lane)
 
+        self._lisp_sync_box = QCheckBox("Trigger the LiSP cues with the GO button of the Script Viewer")
+        self._lisp_sync_box.setChecked(settings.lisp_sync)
+        self._lisp_host_edit = QLineEdit(settings.lisp_host)
+        self._lisp_host_edit.setPlaceholderText(DEFAULT_LISP_HOST)
+        self._lisp_port_box = QSpinBox()
+        self._lisp_port_box.setRange(MIN_PORT, MAX_PORT)
+        self._lisp_port_box.setValue(settings.lisp_port)
+        self._go_on_return_box = QCheckBox("Press the GO button with the Return key")
+        self._go_on_return_box.setChecked(settings.go_on_return)
+        for widget in (self._lisp_host_edit, self._lisp_port_box, self._go_on_return_box):
+            self._lisp_sync_box.toggled.connect(widget.setEnabled)
+            widget.setEnabled(settings.lisp_sync)
+
+        lisp_address_row = QHBoxLayout()
+        lisp_address_row.addWidget(self._lisp_host_edit)
+        lisp_address_row.addWidget(QLabel("Port"))
+        lisp_address_row.addWidget(self._lisp_port_box)
+
         lanes_row = QHBoxLayout()
         lanes_row.addWidget(self._show_lisp_lane_box)
         lanes_row.addWidget(self._show_x32_lane_box)
@@ -63,6 +81,9 @@ class SettingsDialog(QDialog):
         form.addRow("Current block position", position_row)
         form.addRow(self._lane_letter_prefixes_box)
         form.addRow(self._mutes_in_lisp_lane_box)
+        form.addRow("LiSP synchronization", self._lisp_sync_box)
+        form.addRow("LiSP OSC address", lisp_address_row)
+        form.addRow("", self._go_on_return_box)
 
         path_label = QLabel(f"Saved to {SETTINGS_PATH}")
         path_label.setObjectName("settingsPath")
@@ -86,6 +107,10 @@ class SettingsDialog(QDialog):
             show_lisp_lane=self._show_lisp_lane_box.isChecked(),
             show_x32_lane=self._show_x32_lane_box.isChecked(),
             show_light_cue_lane=self._show_light_cue_lane_box.isChecked(),
+            lisp_sync=self._lisp_sync_box.isChecked(),
+            lisp_host=self._lisp_host_edit.text().strip() or DEFAULT_LISP_HOST,
+            lisp_port=self._lisp_port_box.value(),
+            go_on_return=self._go_on_return_box.isChecked(),
         )
 
     def _show_position(self, position: int) -> None:
@@ -113,13 +138,16 @@ QLabel, QCheckBox {{
 QLabel#settingsPath {{
     color: {theme.MUTED_LABEL.name()};
 }}
-QSpinBox, QPushButton {{
+QSpinBox, QLineEdit, QPushButton {{
     background-color: {theme.PAGE.name()};
     color: {theme.TEXT.name()};
     border: 1px solid {theme.BAR_BORDER.name()};
     border-radius: 4px;
     padding: 4px 8px;
     font-size: {theme.STATUS_POINT_SIZE}pt;
+}}
+QSpinBox:disabled, QLineEdit:disabled, QCheckBox:disabled {{
+    color: {theme.DIMMED_TEXT.name()};
 }}
 QPushButton {{
     min-width: 70px;

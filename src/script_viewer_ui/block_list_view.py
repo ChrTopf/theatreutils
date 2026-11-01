@@ -22,6 +22,7 @@ class BlockListView(QListView):
     """The document of block cards, navigated block by block instead of pixel by pixel."""
 
     current_row_changed = pyqtSignal(int)
+    return_pressed = pyqtSignal()
 
     def __init__(self, model: BlockListModel, settings: ViewerSettings, parent=None):
         super().__init__(parent)
@@ -107,6 +108,9 @@ class BlockListView(QListView):
             self.set_current_row(0)
         elif key == Qt.Key_End:
             self.set_current_row(self._block_model.rowCount() - 1)
+        elif key in (Qt.Key_Return, Qt.Key_Enter):
+            if not event.isAutoRepeat():
+                self.return_pressed.emit()
         else:
             super().keyPressEvent(event)
 

@@ -62,8 +62,11 @@ class LispCueFactory:
         return cue
 
     @staticmethod
+    def set_osc_trigger(cue: dict, address: str, cue_number: int) -> None:
+        cue["controller"]["osc"] = [[f"OSC['{address}', 'i', {cue_number}]", "Default"]]
+
+    @staticmethod
     def set_color(cue: dict, color: str) -> None:
-        """Sets the background color the cue is shown with in the LiSP cue list, e.g. `#3584e4`."""
         cue["stylesheet"] = f"background:{color};{FONT_STYLESHEET}"
 
     @staticmethod
