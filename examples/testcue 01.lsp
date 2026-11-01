@@ -5,7 +5,12 @@
             "controller": {
                 "keyboard": [],
                 "midi": [],
-                "osc": []
+                "osc": [
+                    [
+                        "OSC['/lisp/cue', 'i', 1]",
+                        "Default"
+                    ]
+                ]
             },
             "default_start_action": "FadeInStart",
             "default_stop_action": "FadeOutStop",
@@ -106,7 +111,12 @@
             "controller": {
                 "keyboard": [],
                 "midi": [],
-                "osc": []
+                "osc": [
+                    [
+                        "OSC['/lisp/cue', 'i', 2]",
+                        "Default"
+                    ]
+                ]
             },
             "default_start_action": "Start",
             "default_stop_action": "Stop",
@@ -138,7 +148,12 @@
             "controller": {
                 "keyboard": [],
                 "midi": [],
-                "osc": []
+                "osc": [
+                    [
+                        "OSC['/lisp/cue', 'i', 3]",
+                        "Default"
+                    ]
+                ]
             },
             "default_start_action": "Start",
             "default_stop_action": "Stop",
@@ -195,7 +210,12 @@
             "controller": {
                 "keyboard": [],
                 "midi": [],
-                "osc": []
+                "osc": [
+                    [
+                        "OSC['/lisp/cue', 'i', 4]",
+                        "Default"
+                    ]
+                ]
             },
             "default_start_action": "Start",
             "default_stop_action": "Stop",
@@ -327,7 +347,12 @@
             "controller": {
                 "keyboard": [],
                 "midi": [],
-                "osc": []
+                "osc": [
+                    [
+                        "OSC['/lisp/cue', 'i', 6]",
+                        "Default"
+                    ]
+                ]
             },
             "default_start_action": "Start",
             "default_stop_action": "Stop",
@@ -386,17 +411,17 @@
             "selection_mode": false,
             "view_sizes": [
                 [
-                    442,
-                    1569
+                    326,
+                    1157
                 ],
                 [
-                    422,
-                    2560,
-                    840
+                    316,
+                    1917,
+                    629
                 ],
                 [
-                    2985,
-                    841
+                    2236,
+                    630
                 ]
             ]
         },
