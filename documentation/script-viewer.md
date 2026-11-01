@@ -9,6 +9,7 @@ to block and always sees which cue comes next.
 
 - Python 3.10 or newer
 - `PyQt5` (see `requirements.txt`)
+- `pyserial` (see `requirements.txt`), for the [physical GO button](#physical-go-button)
 
 ## Usage
 
@@ -122,6 +123,23 @@ enabled. OSC over UDP is not acknowledged, so the viewer cannot tell whether LiS
 
 The last cue is only kept while the viewer is running. Disabling the synchronization hides the whole bar.
 
+### Physical GO button
+
+The [Buzzer](buzzer.md) can press the GO button as well. If it is enabled in the [settings](#settings), the viewer
+listens to the Arduino on the configured serial port in the background, just like the
+[Serial Keyboard](serial-keyboard.md). Every line `KEY:<index>` from the Arduino presses the GO button on the screen,
+whichever buzzer sent it. As with a mouse click, a press does nothing while the GO button is disabled, so the physical
+button always follows the same rules as the GO button on the screen. The Serial Keyboard is not needed for this and
+must not run at the same time, as only one program can open the serial port.
+
+The port is opened when the viewer starts or when the settings are confirmed, followed by a wait of two seconds,
+because the Arduino resets when the port is opened. If the port cannot be opened or the connection is lost (e.g. the
+Arduino is unplugged), a warning is shown and the viewer stops listening. Confirm the settings with `OK` again to
+retry. Closing the viewer may take up to a few seconds while the port is closed.
+
+On Linux, the user needs read and write access to the serial port, usually by being a member of the `uucp` or
+`dialout` group, depending on the distribution.
+
 ## Settings
 
 The `Settings` button in the top bar opens the settings window. `OK` applies the changes right away and saves them to
@@ -138,6 +156,9 @@ at every start. If it is missing or contains invalid values, the defaults are us
 | LiSP synchronization | `lisp_sync` | `false` | Shows the [LiSP bar](#lisp-bar) with the GO button. |
 | LiSP OSC address | `lisp_host`, `lisp_port` | `127.0.0.1`, `9000` | Host (IP address or host name) and port LiSP receives OSC on, see [LiSP](lisp.md). Only editable while the synchronization is enabled. |
 | GO on Return | `go_on_return` | `false` | The `Return` key presses the GO button, see [Navigation](#navigation). Only editable while the synchronization is enabled. |
+| Physical GO button | `physical_go_button` | `false` | The Arduino buzzer presses the GO button, see [Physical GO button](#physical-go-button). In its own section of the settings window, only editable while the synchronization is enabled. |
+| Serial port | `go_button_port` | `/usb/tty0` | The serial port of the Arduino, e.g. `/dev/ttyUSB0`, `/dev/ttyACM0` or `COM3`. Only editable while the physical GO button is enabled. |
+| Baud rate | `go_button_baud_rate` | `9600` | The baud rate of the serial connection, from 300 to 2000000. Must match the sketch, which uses 9600. Only editable while the physical GO button is enabled. |
 
 ## Navigation
 
@@ -151,6 +172,7 @@ at every start. If it is missing or contains invalid values, the defaults are us
 | Mouse click | Makes the clicked block the current one |
 | Part / scene selectors | Jump to a scene |
 | `GO` button | Starts the next LiSP cue, see [LiSP bar](#lisp-bar) |
+| Physical GO button | Presses the GO button if enabled, see [Physical GO button](#physical-go-button) |
 | `Return`, `Enter` | Presses the GO button if GO on Return is enabled in the [settings](#settings) and the GO button is enabled. Otherwise nothing. Holding the key down does not repeat it. |
 
 The `Return` and `Enter` keys are reserved for the GO button and have no other function.

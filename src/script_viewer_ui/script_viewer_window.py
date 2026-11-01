@@ -6,6 +6,7 @@ from script_viewer_ui.block_list_model import BlockListModel
 from script_viewer_ui.block_list_view import BlockListView
 from script_viewer_ui.cue_lane_segments import LISP_LANE, CueLaneSegments
 from script_viewer_ui.cue_segment import CueSegment
+from script_viewer_ui.go_button_listener import GoButtonListener
 from script_viewer_ui.lisp_bar import LispBar
 from script_viewer_ui.lisp_trigger import LispTrigger
 from script_viewer_ui.scene_index import SceneIndex
@@ -26,6 +27,7 @@ class ScriptViewerWindow(QMainWindow):
         self._current_row = 0
         self._last_lisp_row: int | None = None
         self._lisp_trigger = LispTrigger()
+        self._go_button_listener: GoButtonListener | None = None
 
         self._top_bar = TopBar(SceneIndex(self._blocks), len(self._blocks))
         self._view = BlockListView(BlockListModel(self._blocks, self._cue_lanes, self), self._settings)
@@ -51,6 +53,11 @@ class ScriptViewerWindow(QMainWindow):
         self._view.setFocus()
         self._update_position(0)
         self._update_lisp_bar()
+        self._update_go_button_listener()
+
+    def closeEvent(self, event) -> None:
+        self._stop_go_button_listener()
+        super().closeEvent(event)
 
     def _jump_to_row(self, row: int) -> None:
         self._view.set_current_row(row)
@@ -70,6 +77,7 @@ class ScriptViewerWindow(QMainWindow):
             self._cue_lanes.apply_settings(self._settings)
             self._view.apply_settings(self._settings)
             self._update_lisp_bar()
+            self._update_go_button_listener()
         self._view.setFocus()
 
     def _update_position(self, row: int) -> None:
@@ -82,7 +90,35 @@ class ScriptViewerWindow(QMainWindow):
 
     def _go_on_return(self) -> None:
         if self._settings.lisp_sync and self._settings.go_on_return:
-            self._trigger_lisp_cue()
+            self._lisp_bar.press_go()
+
+    def _update_go_button_listener(self) -> None:
+        """Starts, restarts or stops listening to the physical GO button according to the settings."""
+        wanted = self._settings.lisp_sync and self._settings.physical_go_button
+        listener = self._go_button_listener
+        if (wanted and listener is not None and listener.isRunning()
+                and listener.port == self._settings.go_button_port
+                and listener.baud_rate == self._settings.go_button_baud_rate):
+            return
+        self._stop_go_button_listener()
+        if wanted:
+            listener = GoButtonListener(self._settings.go_button_port, self._settings.go_button_baud_rate, self)
+            listener.pressed.connect(self._lisp_bar.press_go)
+            listener.failed.connect(self._show_go_button_error)
+            listener.start()
+            self._go_button_listener = listener
+
+    def _stop_go_button_listener(self) -> None:
+        if self._go_button_listener is not None:
+            self._go_button_listener.stop()
+            self._go_button_listener = None
+
+    def _show_go_button_error(self, error: str) -> None:
+        QMessageBox.warning(self, "Physical GO button not available",
+                            f"Cannot listen to the physical GO button on {self._settings.go_button_port} at "
+                            f"{self._settings.go_button_baud_rate} baud: {error}\n\n"
+                            f"Check the connection and confirm the settings again to retry.")
+        self._view.setFocus()
 
     def _trigger_lisp_cue(self) -> None:
         segment = self._next_lisp_segment()

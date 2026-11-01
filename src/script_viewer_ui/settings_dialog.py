@@ -1,10 +1,11 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QCheckBox, QDialog, QDialogButtonBox, QFormLayout, QHBoxLayout, QLabel, QLineEdit,
-                             QSlider, QSpinBox, QVBoxLayout)
+from PyQt5.QtWidgets import (QCheckBox, QDialog, QDialogButtonBox, QFormLayout, QGroupBox, QHBoxLayout, QLabel,
+                             QLineEdit, QSlider, QSpinBox, QVBoxLayout)
 
 from script_viewer_ui import theme
 from script_viewer_ui.cue_lane_segments import LIGHT_CUE_LANE, LISP_LANE, X32_LANE
-from script_viewer_ui.viewer_settings import (DEFAULT_LISP_HOST, MAX_LANE_WIDTH, MAX_PORT, MIN_LANE_WIDTH, MIN_PORT,
+from script_viewer_ui.viewer_settings import (DEFAULT_GO_BUTTON_PORT, DEFAULT_LISP_HOST, MAX_BAUD_RATE,
+                                              MAX_LANE_WIDTH, MAX_PORT, MIN_BAUD_RATE, MIN_LANE_WIDTH, MIN_PORT,
                                               POSITION_BOTTOM, POSITION_TOP, SETTINGS_PATH, ViewerSettings)
 
 LANE_WIDTH_STEP = 10
@@ -60,6 +61,24 @@ class SettingsDialog(QDialog):
             self._lisp_sync_box.toggled.connect(widget.setEnabled)
             widget.setEnabled(settings.lisp_sync)
 
+        self._physical_go_button_box = QCheckBox("Press the GO button with the physical GO button (Arduino buzzer)")
+        self._physical_go_button_box.setChecked(settings.physical_go_button)
+        self._go_button_port_edit = QLineEdit(settings.go_button_port)
+        self._go_button_port_edit.setPlaceholderText(DEFAULT_GO_BUTTON_PORT)
+        self._go_button_baud_rate_box = QSpinBox()
+        self._go_button_baud_rate_box.setRange(MIN_BAUD_RATE, MAX_BAUD_RATE)
+        self._go_button_baud_rate_box.setValue(settings.go_button_baud_rate)
+        self._lisp_sync_box.toggled.connect(self._update_physical_go_button_widgets)
+        self._physical_go_button_box.toggled.connect(self._update_physical_go_button_widgets)
+        self._update_physical_go_button_widgets()
+
+        go_button_form = QFormLayout()
+        go_button_form.addRow(self._physical_go_button_box)
+        go_button_form.addRow("Serial port", self._go_button_port_edit)
+        go_button_form.addRow("Baud rate", self._go_button_baud_rate_box)
+        go_button_group = QGroupBox("Physical GO button")
+        go_button_group.setLayout(go_button_form)
+
         lisp_address_row = QHBoxLayout()
         lisp_address_row.addWidget(self._lisp_host_edit)
         lisp_address_row.addWidget(QLabel("Port"))
@@ -94,6 +113,7 @@ class SettingsDialog(QDialog):
 
         layout = QVBoxLayout(self)
         layout.addLayout(form)
+        layout.addWidget(go_button_group)
         layout.addWidget(path_label)
         layout.addWidget(buttons)
         self.setStyleSheet(_STYLE_SHEET)
@@ -111,10 +131,20 @@ class SettingsDialog(QDialog):
             lisp_host=self._lisp_host_edit.text().strip() or DEFAULT_LISP_HOST,
             lisp_port=self._lisp_port_box.value(),
             go_on_return=self._go_on_return_box.isChecked(),
+            physical_go_button=self._physical_go_button_box.isChecked(),
+            go_button_port=self._go_button_port_edit.text().strip() or DEFAULT_GO_BUTTON_PORT,
+            go_button_baud_rate=self._go_button_baud_rate_box.value(),
         )
 
     def _show_position(self, position: int) -> None:
         self._position_label.setText(_position_text(position))
+
+    def _update_physical_go_button_widgets(self) -> None:
+        lisp_sync = self._lisp_sync_box.isChecked()
+        self._physical_go_button_box.setEnabled(lisp_sync)
+        serial_editable = lisp_sync and self._physical_go_button_box.isChecked()
+        self._go_button_port_edit.setEnabled(serial_editable)
+        self._go_button_baud_rate_box.setEnabled(serial_editable)
 
 
 def _position_text(position: int) -> str:
@@ -134,6 +164,19 @@ QDialog {{
 QLabel, QCheckBox {{
     color: {theme.TEXT.name()};
     font-size: {theme.STATUS_POINT_SIZE}pt;
+}}
+QGroupBox {{
+    color: {theme.TEXT.name()};
+    font-size: {theme.STATUS_POINT_SIZE}pt;
+    border: 1px solid {theme.BAR_BORDER.name()};
+    border-radius: 4px;
+    margin-top: 12px;
+    padding-top: 8px;
+}}
+QGroupBox::title {{
+    subcontrol-origin: margin;
+    left: 8px;
+    padding: 0 4px;
 }}
 QLabel#settingsPath {{
     color: {theme.MUTED_LABEL.name()};
