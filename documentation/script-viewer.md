@@ -142,7 +142,9 @@ On Linux, the user needs read and write access to the serial port, usually by be
 
 ## Settings
 
-The `Settings` button in the top bar opens the settings window. `OK` applies the changes right away and saves them to
+The `Settings` button in the top bar opens the settings window. It groups the settings into the sections `Cue lanes`
+and `Document` on the left and `LiSP synchronization` and `Physical GO button` on the right. Settings that depend on a
+disabled one are greyed out. `OK` applies the changes right away and saves them to
 `~/.theatreutils/script_viewer.json` in the home directory of the current user; `Cancel` discards them. The file is read
 at every start. If it is missing or contains invalid values, the defaults are used for them.
 
