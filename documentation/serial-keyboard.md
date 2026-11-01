@@ -3,6 +3,10 @@
 `src/serial_keyboard.py` receives the button presses of the [Buzzer](buzzer.md) over a serial port and executes one
 shell command for each of them on the machine it runs on.
 
+To press the GO button of the [Script Viewer](script-viewer.md#physical-go-button) with the buzzer, this program is
+not needed: the Script Viewer listens to the Arduino itself. Both share the serial code in
+`src/serial_input/arduino_interface.py`.
+
 ## Requirements
 
 - Python 3.10 or newer

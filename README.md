@@ -20,6 +20,7 @@ The following list of programs are used to run theater shows
    annotations, audio and lighting commands. Next to every block, the generated LiSP cues, X32 snippets and light cues
    are shown. This application is intended to be used during the live theater show to read through the text in parallel.
    Optionally, its GO button starts the LiSP cue of the current block via OSC, keeping the viewer and LiSP in sync.
+   The GO button can also be pressed with the physical buzzer, which the viewer reads from the Arduino directly.
 2. Lisp: The linux show player software is used to control the decks and play audio effects during the show.
    Lisp is not part of this repository. You can find Lisp [here](https://www.linux-show-player.org/).
 3. OSC Relay: This is a command line application which receives the OSC commands from Lisp and routes them to the 

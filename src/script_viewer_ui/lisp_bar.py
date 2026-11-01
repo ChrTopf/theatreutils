@@ -51,6 +51,9 @@ class LispBar(QWidget):
             self._blink_timer.stop()
             self._set_blink(False)
 
+    def press_go(self) -> None:
+        self._go_button.click()
+
     def show_last_cue(self, segment: CueSegment | None) -> None:
         self._show_cue(self._last_cue_label, segment)
 

@@ -17,52 +17,18 @@ Usage:  python3 serial_keyboard.py --port /dev/ttyUSB0 --baud 9600 --command "no
 
 import subprocess
 import sys
-import time
 from argparse import ArgumentParser, ArgumentTypeError, Namespace
 
-from serial import Serial, SerialException
+from serial import SerialException
 from serial.tools.list_ports import comports
 
-DEFAULT_BAUD_RATE = 9600
-KEY_PREFIX = "KEY:"
-# The Arduino resets when the port is opened and needs a moment before it sends anything.
-ARDUINO_RESET_DELAY = 2
+from serial_input.arduino_interface import DEFAULT_BAUD_RATE, ArduinoInterface
 
 
 def non_empty_command(text: str) -> str:
     if not text.strip():
         raise ArgumentTypeError("The command must not be empty.")
     return text
-
-
-class ArduinoInterface:
-    """Reads the button indices the Arduino sends over the serial port."""
-
-    def __init__(self, port: str, baud_rate: int):
-        self.port = port
-        self.baud_rate = baud_rate
-        self.serial: Serial | None = None
-
-    def __enter__(self) -> "ArduinoInterface":
-        self.serial = Serial(self.port, self.baud_rate, timeout=1)
-        time.sleep(ARDUINO_RESET_DELAY)
-        return self
-
-    def __exit__(self, *exc_info) -> None:
-        if self.serial is not None:
-            self.serial.close()
-            self.serial = None
-
-    def read_index(self) -> int | None:
-        """Waits up to the read timeout for a key line and returns its index, or None."""
-        line = self.serial.readline().decode("utf-8", errors="replace").strip()
-        if not line.startswith(KEY_PREFIX):
-            return None
-        payload = line[len(KEY_PREFIX):]
-        if not payload.isdigit():
-            print(f"Ignoring malformed line from Arduino: '{line}'")
-            return None
-        return int(payload)
 
 
 def execute(command: str) -> None:
