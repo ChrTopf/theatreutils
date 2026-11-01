@@ -17,8 +17,6 @@ LANES = (LISP_LANE, X32_LANE, LIGHT_CUE_LANE)
 # Separates the names of several cues of one deck triggered by the same block.
 CUE_NAME_SEPARATOR = ", "
 
-# The segments of a lane are numbered from this number on.
-FIRST_SEGMENT_NUMBER = 1
 # Replaces the letter of the lane in front of the segment numbers, unless the settings ask for the letters.
 NUMBER_PREFIX = "#"
 
@@ -37,14 +35,15 @@ class CueLaneSegments:
         self._rows_of_blocks = {block.id: row for row, block in enumerate(script.blocks)}
         self._names: tuple[dict[int, list[str]], ...] = tuple({} for _ in LANES)
         self._colors: tuple[dict[int, QColor], ...] = tuple({} for _ in LANES)
-
-        for cue in script.lisp_cues:
-            self._add(cue.block_id, LISP_LANE, cue.name, QColor(cue.color))
-        for snippet in script.x32_snippets:
-            self._add(snippet.block_id, X32_LANE, snippet.name, X32_LANE.color)
-        for cue in script.light_cues:
+        self._numbers: tuple[dict[int, int], ...] = tuple({} for _ in LANES)
+        
+        for cue in sorted(script.lisp_cues, key=lambda cue: cue.number):
+            self._add(cue.block_id, LISP_LANE, cue.number, cue.name, QColor(cue.color))
+        for snippet in sorted(script.x32_snippets, key=lambda snippet: snippet.number):
+            self._add(snippet.block_id, X32_LANE, snippet.number, snippet.name, X32_LANE.color)
+        for cue in sorted(script.light_cues, key=lambda cue: cue.cue):
             for block_id in cue.block_ids:
-                self._add(block_id, LIGHT_CUE_LANE, cue.name, LIGHT_CUE_LANE.color)
+                self._add(block_id, LIGHT_CUE_LANE, cue.cue, cue.name, LIGHT_CUE_LANE.color)
 
         self.apply_settings(settings)
 
@@ -64,22 +63,24 @@ class CueLaneSegments:
         segments = (self._segments_by_first_row[LANES.index(lane)].get(row) for lane in lanes)
         return [segment for segment in segments if segment is not None]
 
-    def _add(self, block_id: int, lane: CueLane, name: str, color: QColor) -> None:
+    def _add(self, block_id: int, lane: CueLane, number: int, name: str, color: QColor) -> None:
         row = self._rows_of_blocks.get(block_id)
         if row is not None:
             self._names[LANES.index(lane)].setdefault(row, []).append(name)
             self._colors[LANES.index(lane)].setdefault(row, color)
+            self._numbers[LANES.index(lane)].setdefault(row, number)
 
     def _build_segments(self, lane: CueLane) -> list[CueSegment]:
         names_by_row = self._names[LANES.index(lane)]
         colors_by_row = self._colors[LANES.index(lane)]
+        numbers_by_row = self._numbers[LANES.index(lane)]
         first_rows = sorted(names_by_row)
         prefix = lane.prefix if self._settings.lane_letter_prefixes else NUMBER_PREFIX
         segments = []
         for index, first_row in enumerate(first_rows):
             is_last = index + 1 == len(first_rows)
             last_row = self._row_count - 1 if is_last else first_rows[index + 1] - 1
-            label = f"{prefix}{index + FIRST_SEGMENT_NUMBER}"
+            label = f"{prefix}{numbers_by_row[first_row]}"
             name = CUE_NAME_SEPARATOR.join(dict.fromkeys(names_by_row[first_row]))
             details = self._details(lane, self._blocks[first_row])
             segments.append(CueSegment(first_row, last_row, label, name, colors_by_row[first_row], details))
